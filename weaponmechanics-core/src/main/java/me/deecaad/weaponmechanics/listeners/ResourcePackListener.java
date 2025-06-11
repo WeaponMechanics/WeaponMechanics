@@ -31,32 +31,25 @@ public class ResourcePackListener implements Listener {
 
     private void determineVersion() {
         try {
-            String link = "https://api.github.com/repos/WeaponMechanics/MechanicsMain/releases/latest";
+            String link = "https://api.github.com/repos/WeaponMechanics/ResourcePack/releases/latest";
             URI uri = URI.create(link);
             URLConnection connection = uri.toURL().openConnection();
             connection.setRequestProperty("User-Agent", "Mozilla/5.0");
             connection.setConnectTimeout(10000);
             connection.setReadTimeout(30000);
 
-            InputStream in = connection.getInputStream();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-
+            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             JsonObject json = JsonParser.parseReader(reader).getAsJsonObject();
+            String tag = json.get("tag_name").getAsString();
             JsonArray assets = json.getAsJsonArray("assets");
 
             for (JsonElement asset : assets) {
                 String fileName = asset.getAsJsonObject().get("name").getAsString();
 
-                if (fileName.startsWith("WeaponMechanicsResourcePack")) {
-                    String[] split = fileName.split("-");
-                    if (split.length > 1) {
-                        String version = split[1];
-                        if (version.endsWith(".zip")) {
-                            version = version.substring(0, version.length() - 4);
-                        }
-                        resourcePackVersion = version;
-                        break; // Exit the loop after finding the resource pack version
-                    }
+                if (fileName.startsWith("WeaponMechanicsResourcePack-") && fileName.endsWith(".zip")) {
+                    resourcePackVersion = tag;
+                    resourcePackLink = asset.getAsJsonObject().get("browser_download_url").getAsString();
+                    WeaponMechanics.getInstance().debugger.info("Found resource pack version " + tag + " at " + resourcePackLink);
                 }
             }
         } catch (IOException ex) {
@@ -65,8 +58,6 @@ public class ResourcePackListener implements Listener {
 
         if (resourcePackVersion == null) {
             WeaponMechanics.getInstance().debugger.warning("Failed to fetch resource pack version! Enable debug mode for more logs.");
-        } else {
-            resourcePackLink = "https://raw.githubusercontent.com/WeaponMechanics/MechanicsMain/master/resourcepack/WeaponMechanicsResourcePack-" + resourcePackVersion + ".zip";
         }
     }
 

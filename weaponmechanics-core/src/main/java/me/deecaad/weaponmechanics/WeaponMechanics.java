@@ -183,17 +183,7 @@ public class WeaponMechanics extends MechanicsPlugin {
             int readTimeout = configuration.getInt("Resource_Pack_Download.Read_Timeout");
 
             if ("LATEST".equals(link)) {
-                try {
-                    String version = resourcePackListener.getResourcePackVersion();
-                    link = "https://raw.githubusercontent.com/WeaponMechanics/MechanicsMain/"
-                            + "master/resourcepack/WeaponMechanicsResourcePack-"
-                            + version
-                            + ".zip";
-                } catch (InternalError e) {
-                    // If we fail to get the version, log and bail out (future completes normally).
-                    debugger.severe("Failed to fetch resource pack version due to timeout", e);
-                    return;
-                }
+                link = resourcePackListener.getResourcePackLink();
             }
 
             try {
