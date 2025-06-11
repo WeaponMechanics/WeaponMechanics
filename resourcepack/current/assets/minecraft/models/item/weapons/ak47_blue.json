@@ -1,8 +1,0 @@
-{
-    "parent": "item/weapons/ak47",
-    "textures": {
-		"2": "block/color/blue_camo_two",
-		"4": "block/color/darkblue",
-		"5": "block/color/blue_camo"
-    }
-}

@@ -1,8 +1,0 @@
-# This YAML file is used by the InlineSerializerTest to test how to use escaped
-# characters. Since YAML also uses the backslash for escaping characters, we
-# need a double backslash in order to escape a character (This is called
-# backslash pollution, and it sucks, but it's the best we got).
-
-Key_1: "foo{msg=<green>Hello\\, there, response=<red>GENERAL KENOBI}"
-Key_2: "foo{messages=[Escaped\\], escaped\\,, you like jazz\\?]}"
-Key_3: "foo{escaped=\\\\ Slash /}"

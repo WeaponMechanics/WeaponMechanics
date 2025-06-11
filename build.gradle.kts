@@ -1,110 +1,93 @@
 plugins {
-    id("com.github.breadmoirai.github-release") version "2.4.1"
-    id("com.cjcrafter.polymart-release") version "1.0.1"
+    id("io.papermc.paperweight.userdev") version "2.0.0-beta.17" apply false
+    kotlin("jvm") version libs.versions.kotlin apply false
+    base
+    id("org.jreleaser") version "1.18.0"
 }
 
-polymart {
-    val weaponMechanicsVersion = findProperty("weaponMechanicsVersion") as? String ?: throw IllegalArgumentException("weaponMechanicsVersion was null")
+allprojects {
+    subprojects {
+        pluginManager.withPlugin("java") {
+            tasks.withType<JavaCompile>().configureEach {
+                options.release.set(21)
+                options.encoding = Charsets.UTF_8.name()
+            }
+        }
 
-    apiKey = findProperty("polymart_api_key").toString()
-    title = weaponMechanicsVersion
-    version = weaponMechanicsVersion
-    resourceId = 4709
-    message = "This is a *test update* which was **published automatically**. You may ignore this."
-    file.set(file("build").resolve("WeaponMechanics.zip"))
-}
-
-githubRelease {
-
-    // https://github.com/BreadMoirai/github-release-gradle-plugin
-    val weaponMechanicsVersion = findProperty("weaponMechanicsVersion") as? String ?: throw IllegalArgumentException("weaponMechanicsVersion was null")
-
-    owner.set("WeaponMechanics")
-    repo.set("MechanicsMain")
-    authorization.set("Token ${findProperty("pass").toString()}")
-    tagName.set("v${weaponMechanicsVersion}")
-    targetCommitish.set("master")
-    releaseName.set("v${weaponMechanicsVersion}")
-    draft.set(false)
-    prerelease.set(false)
-    generateReleaseNotes.set(true)
-    body.set("")
-    overwrite.set(false)
-    allowUploadToExisting.set(false)
-    apiEndpoint.set("https://api.github.com")
-
-    setReleaseAssets(file("build").listFiles())
-
-    // If set to true, you can debug that this would do
-    dryRun.set(false)
-}
-
-// This is a helper method to compile MechanicsCore, WeaponMechanics, and to
-// put all the stuff in zip files and such for github release.
-tasks.register("buildForSpigotRelease").configure {
-    println("Cleaning build directory")
-    val folder = file("build")
-    folder.deleteRecursively()
-    folder.mkdir()
-
-    dependsOn(":BuildMechanicsCore:shadowJar")
-    dependsOn(":BuildWeaponMechanics:shadowJar")
-
-    finalizedBy("resourcePackForSpigotRelease", "zipForSpigotRelease")
-}
-
-tasks.register<Copy>("resourcePackForSpigotRelease") {
-    dependsOn("buildForSpigotRelease")
-
-    // !!! Has to be updated when resource pack is updated !!!
-    val resourcePackVersion = findProperty("resourcePackVersion") as? String ?: throw IllegalArgumentException("resourcePackVersion was null")
-
-    from("${layout.projectDirectory}\\resourcepack\\WeaponMechanicsResourcePack-${resourcePackVersion}.zip")
-    into(layout.buildDirectory)
-
-    doFirst {
-        println("Copy resource pack")
-    }
-}
-
-tasks.register<Zip>("zipForSpigotRelease") {
-    dependsOn("buildForSpigotRelease", "resourcePackForSpigotRelease")
-    archiveFileName.set("WeaponMechanics.zip")
-    destinationDirectory.set(layout.buildDirectory)
-
-    from(layout.buildDirectory) {
-        include("*.jar")
-    }
-
-    from("install-instructions.txt")
-
-    doFirst {
-        println("Generate zip file")
-    }
-}
-
-tasks.register<Zip>("zipNewResourcePack") {
-    // root > resourcepack > current
-    // is a directory with the current resource pack files. This task will
-    // take all of those files and put them in a zip file with the correct
-    // version number.
-    val resourcePackVersion = findProperty("resourcePackVersion") as? String ?: throw IllegalArgumentException("resourcePackVersion was null")
-
-    // if there is already file with the same name, throw an exception
-    val file = file("resourcepack").resolve("WeaponMechanicsResourcePack-${resourcePackVersion}.zip")
-    if (file.exists()) {
-        throw IllegalArgumentException("Resource pack v$resourcePackVersion already exists: ${file.absolutePath}")
-    }
-
-    archiveFileName.set("WeaponMechanicsResourcePack-${resourcePackVersion}.zip")
-    destinationDirectory.set(file("resourcepack"))
-
-    from(file("resourcepack").resolve("current"))
-
-    // add to git
-    doLast {
-        exec {
-            commandLine = listOf("git", "add", file.absolutePath)
+        pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
+            tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+                kotlinOptions {
+                    jvmTarget = "21"
+                }
+            }
         }
     }
+}
+
+jreleaser {
+    project {
+        name.set("WeaponMechanics")
+        group = "com.cjcrafter"
+        version = findProperty("weaponmechanics.version").toString()
+        description = "A new age of weapons in Minecraft"
+        authors.add("CJCrafter <collinjbarber@gmail.com>")
+        authors.add("DeeCaaD <perttu.kangas@hotmail.fi>")
+        license = "MIT" // SPDX identifier
+
+        java {
+            groupId = "com.cjcrafter"
+            artifactId = "weaponmechanics"
+            version = findProperty("weaponmechanics.version").toString()
+        }
+    }
+
+    signing {
+        active.set(org.jreleaser.model.Active.ALWAYS)
+        armored.set(true)
+    }
+
+    deploy {
+        maven {
+            mavenCentral {
+                create("releaseDeploy") {
+                    active.set(org.jreleaser.model.Active.RELEASE)
+                    url.set("https://central.sonatype.com/api/v1/publisher")
+                    // run ./gradlew mechanicscore-core:publish before deployment
+                    stagingRepository("weaponmechanics-core/build/staging-deploy")
+                    // Credentials (JRELEASER_MAVENCENTRAL_USERNAME, JRELEASER_MAVENCENTRAL_PASSWORD or JRELEASER_MAVENCENTRAL_TOKEN)
+                    // will be picked up from ~/.jreleaser/config.toml
+                }
+            }
+
+            nexus2 {
+                create("sonatypeSnapshots") {
+                    active.set(org.jreleaser.model.Active.SNAPSHOT)
+                    url.set("https://central.sonatype.com/repository/maven-snapshots/")
+                    snapshotUrl.set("https://central.sonatype.com/repository/maven-snapshots/")
+                    applyMavenCentralRules = true
+                    snapshotSupported = true
+                    closeRepository = true
+                    releaseRepository = true
+                    stagingRepository("mechanicscore-core/build/staging-deploy")
+                }
+            }
+        }
+    }
+
+    // TODO consider replacing github release with this
+    /*
+    release {
+        github { // Assuming your SCM is GitHub, based on POM
+            // owner.set("WeaponMechanics") // Auto-detected from SCM URL if possible
+            // name.set("MechanicsCore")   // Auto-detected
+            tagName.set("v{{projectVersion}}")
+            // You might want to configure changelog generation here
+            changelog {
+                formatted.set("ALWAYS")
+                preset.set("conventionalcommits")
+                // format.set("- {{commitShortHash}} {{commitTitle}}") // Customize format
+            }
+        }
+    }
+     */
 }

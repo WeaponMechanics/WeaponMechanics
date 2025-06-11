@@ -3,6 +3,7 @@ Thank you for considering contributing to this project. We appreciate your time 
 We have a few guidelines to help you get started.
 
 WeaponMechanics leverages the following technologies:
+  - [MechanicsCore](https://github.com/WeaponMechanics/MechanicsCore)
   - [Gradle](https://gradle.org/)
     - Handling modules, dependencies, and other build tasks 
   - [Kotlin](https://kotlinlang.org/) 
@@ -10,18 +11,22 @@ WeaponMechanics leverages the following technologies:
     - Use `@NotNull` and `@Nullable` annotations for null safety
     - Use Kotlin for utility classes, and other appropriate classes
   - [paperweight-userdev](https://github.com/PaperMC/paperweight-test-plugin)
-    - Automatically download and remaps server jars for 1.17.2+ 
-  - [brigadier](https://github.com/Mojang/brigadier)
-    - Command parsing and handling
+    - Automatically download and remaps server jars for 1.17.2+
 
 ## New contributor guide
 
 To build the plugin for Spigot, run:
 ```shell
-./gradlew buildForSpigotRelease
+./gradlew shadowJar
 ```
 
-The `.jar` files will be located in the `build/` directory.
+The `.jar` file will be located in the `weaponmechanics-build/build/libs` directory. Note that
+you will still need to have the `MechanicsCore` plugin installed on your server for WeaponMechanics to work.
+
+## Commit Style
+We use [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) for our commit messages. Generally, this means:
+- Use `fix: <description>` for bug fixes
+- Use `feat: <description>` for new features
 
 ## Making a pull request
 
@@ -29,7 +34,6 @@ When making a pull request, GitHub Actions will automatically run the following
 checks on your code:
 ```shell
 ./gradlew build
-./gradlew test
 ./gradlew spotlessCheck
 ```
 

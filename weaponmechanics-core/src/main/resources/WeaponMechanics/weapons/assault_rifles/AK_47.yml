@@ -1,0 +1,146 @@
+AK_47:
+  Info:
+    Weapon_Item:
+      Type: "FEATHER"
+      Name: "<gold>AK-47"
+      Lore:
+        - "<gray>Very reliable automatic assault rifle chambered in 7.62mm Soviet."
+        - "<gray>Large caliber ammunition requires skill to control recoil."
+        - ""
+        - "<gray>Weapon Statistics <gold>-<gray> 66.5"
+        - "<gold>➣<gray> 68 <gold>⟸ <gray>Accuracy"
+        - "<gold>➣<gray> 76 <gold>⟸ <gray>Damage"
+        - "<gold>➣<gray> 67 <gold>⟸ <gray>Range"
+        - "<gold>➣<gray> 61 <gold>⟸ <gray>Fire Rate"
+        - "<gold>➣<gray> 59 <gold>⟸ <gray>Mobility"
+        - "<gold>➣<gray> 68 <gold>⟸ <gray>Control"
+      Unbreakable: true
+      Hide_Flags: true
+      Attributes:
+        - "movement_speed -0.0181"
+      Deny_Use_In_Crafting: true
+    Weapon_Info_Display:
+      Action_Bar:
+        Message: "<gold>AK-47<firearm_state> <gray>«<gold><ammo_left><gray>»<gold><reload>"
+    Weapon_Get_Mechanics:
+      - "Sound{sound=item.armor.equip_chain, pitch=0.75, listeners=Source{}}"
+    Weapon_Equip_Delay: 30
+    Cancel:
+      Drop_Item: true
+      Arm_Swing_Animation: true
+      Break_Blocks: true
+  Skin:
+    Default: 5
+    Scope: ADD 1000
+    Sprint: ADD 2000
+    blue: ADD 10000 # blue and red will only work if you have purchased WMC
+    red: ADD 20000
+  Projectile: "assault_rifle_projectile"
+  Shoot:
+    Trigger:
+      Main_Hand: "RIGHT_CLICK"
+      Off_Hand: "RIGHT_CLICK"
+      Circumstance:
+        Swimming: "DENY"
+        Sprinting: "DENY"
+        Dual_Wielding: "DENY"
+    Projectile_Speed: 80
+    Fully_Automatic_Shots_Per_Second: 10
+    Spread:
+      Base_Spread: 3.9
+      Modify_Spread_When:
+        Zooming: 50%
+        Sneaking: 50%
+        In_Midair: 150%
+    Recoil:
+      Mean_X: 0.3            # Slight horizontal pull
+      Mean_Y: 1.6            # Stronger vertical recoil
+      Variance_X: 0.3        # Some randomness left/right
+      Variance_Y: 0.3        # Some randomness up/down
+      Speed: 3.0             # Fairly snappy kick
+      Damping: 0.1           # Prevents infinite climb
+      Damping_Recovery: 0.15 # Steady recover toward center
+      Smoothing: 0.4         # Smooth out big jolts
+      Max_Accumulation: 15.0 # Caps max climb
+    Mechanics:
+      - "CustomSound{sound=shoot.ak47.loud, volume=6, noise=0.1}"
+  Reload:
+    Trigger:
+      Main_Hand: "DROP_ITEM"
+      Off_Hand: "DROP_ITEM"
+    Magazine_Size: 30
+    Reload_Duration: 57
+    Start_Mechanics:
+      - "CustomSound{sound=reload.start.normal, volume=0.5, noise=0.1}"
+    Finish_Mechanics:
+      - "CustomSound{sound=reload.end.normal, volume=0.5, noise=0.1}"
+  Damage:
+    Base_Damage: 10.2
+    Armor_Damage: 3
+    Dropoff:
+      - "10 -1.66"
+      - "25 -3.32"
+      - "50 -4.98"
+  Scope:
+    Trigger:
+      Main_Hand: "LEFT_CLICK"
+      Off_Hand: "LEFT_CLICK"
+    Zoom_Amount: 1.5
+    Shoot_Delay_After_Scope: 15
+    Mechanics:
+      - "CustomSound{sound=scope.in, volume=0.5, noise=0.1, listeners=Source{}}"
+    Zoom_Off:
+      Mechanics:
+        - "CustomSound{sound=scope.out, volume=0.5, noise=0.1, listeners=Source{}}"
+  Firearm_Action:
+    Type: "SLIDE"
+    Open:
+      Time: 8
+      Mechanics:
+        - "Sound{sound=block.note_block.hat, volume=0.5, noise=0.1, listeners=Source{}}"
+        - "Sound{sound=block.piston.contract, volume=0.5, noise=0.1, listeners=Source{}, delayBeforePlay=2}"
+    Close:
+      Time: 8
+      Mechanics:
+        - "Sound{sound=block.piston.extend, volume=0.5, noise=0.1, listeners=Source{}}"
+
+  # The following options are added by WeaponMechanicsCosmetics, and you will
+  # not see the changes take effect until you purchase it.
+
+  Cosmetics:
+    Muzzle_Flash: true
+    Splash_Mechanics:
+      - "Sound{sound=entity.generic.splash, pitch=1.85, noise=0.15} @Target{}"
+      - "Particle{particle=WATER_SPLASH, count=20, noise=0.2 0.2 0.2} @Target{}"
+    Bullet_Zip:
+      Maximum_Distance: 4.0
+      Sounds:
+        - "CustomSound{sound=fx.whiz, noise=0.02, listeners=Target{}} @Target{}"
+    Third_Person_Pose:
+      Default: NONE
+      Scope: BOW
+      Reload: BLOCK
+      Firearm_Action: CROSSBOW
+
+  Trail:
+    Distance_Between_Particles: 0.3
+    Particle_Chooser: LOOP
+    Particles:
+      - "Particle{particle=DUST_COLOR_TRANSITION, color=RED, fadeColor=YELLOW, size=0.4}"
+
+  Show_Time:
+    Reload:
+      Item_Cooldown: true
+      Exp: true
+      Action_Bar: "<gray>Reloading <bar> <gray><time>s"
+      Action_Bar_Cancelled: "<red>Reload Cancelled"
+      Bar:
+        Left_Color: "<gray>"
+        Right_Color: "<red>"
+        Left_Symbol: "|"
+        Right_Symbol: "|"
+        Symbol_Amount: 30
+    Weapon_Equip_Delay:
+      Item_Cooldown: true
+    Shoot_Delay_After_Scope:
+      Item_Cooldown: true
