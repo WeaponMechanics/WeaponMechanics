@@ -21,6 +21,19 @@ allprojects {
                 }
             }
         }
+
+        tasks.withType<Test>().configureEach {
+            useJUnitPlatform()
+        }
+
+        tasks.withType<Javadoc>().configureEach {
+            (options as StandardJavadocDocletOptions).apply {
+                encoding = Charsets.UTF_8.name()
+                charSet = Charsets.UTF_8.name()
+                addStringOption("Xdoclint:none", "-quiet")
+                links("https://docs.oracle.com/en/java/javase/21/docs/api/")
+            }
+        }
     }
 }
 
