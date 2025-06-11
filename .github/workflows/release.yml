@@ -1,0 +1,101 @@
+name: Full Release
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  full-release:
+    runs-on: ubuntu-latest
+    environment: Gradle Deploy
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java 21 & cache Gradle
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: gradle
+
+      - name: Extract release version
+        id: ver
+        run: |
+          V=$(./gradlew -q properties \
+            | awk '/^version: / { print $2 }')
+          R=${V%-SNAPSHOT}
+          echo "release_version=$R" >> $GITHUB_OUTPUT
+
+      - name: Remove -SNAPSHOT from gradle.properties
+        run: |
+          sed -i \
+            "s|^\(weaponmechanics\.version=\).*|\1${{ steps.ver.outputs.release_version }}|" \
+            gradle.properties
+
+      # 4. Publish to your Maven repo & build the shadow JAR
+      - name: Assemble and create local maven repository
+        run: ./gradlew publish shadowJar --no-daemon
+
+      # 5. Create the GitHub release via JReleaser
+      - name: Release with JReleaser
+        env:
+          JRELEASER_GITHUB_TOKEN: ${{ secrets.JRELEASER_GITHUB_TOKEN }}
+          JRELEASER_GPG_PASSPHRASE: ${{ secrets.JRELEASER_GPG_PASSPHRASE }}
+          JRELEASER_GPG_PUBLIC_KEY: ${{ secrets.JRELEASER_GPG_PUBLIC_KEY }}
+          JRELEASER_GPG_SECRET_KEY: ${{ secrets.JRELEASER_GPG_SECRET_KEY }}
+          JRELEASER_MAVENCENTRAL_TOKEN: ${{ secrets.JRELEASER_MAVENCENTRAL_TOKEN }}
+          JRELEASER_MAVENCENTRAL_USERNAME: ${{ secrets.JRELEASER_MAVENCENTRAL_USERNAME }}
+          JRELEASER_NEXUS2_SONATYPESNAPSHOTS_TOKEN: ${{ secrets.JRELEASER_NEXUS2_SONATYPESNAPSHOTS_TOKEN }}
+          JRELEASER_NEXUS2_SONATYPESNAPSHOTS_USERNAME: ${{ secrets.JRELEASER_NEXUS2_SONATYPESNAPSHOTS_USERNAME }}
+        run: ./gradlew jreleaserRelease --no-daemon --no-configuration-cache
+
+      - name: Fetch latest ResourcePack
+        uses: robinraju/release-downloader@v1
+        with:
+          repository: WeaponMechanics/ResourcePack
+          latest: true
+          fileName: 'WeaponMechanicsResourcePack-*.zip'
+          out-file-path: resourcepack
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Fetch latest MechanicsCore
+        uses: robinraju/release-downloader@v1
+        with:
+          repository: WeaponMechanics/MechanicsCore
+          latest: true
+          fileName: 'MechanicsCore-*.jar'
+          out-file-path: mechanicscore
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build combined zip
+        run: |
+          VER=${{ steps.ver.outputs.release_version }}
+          mkdir bundle
+          cp build/libs/WeaponMechanics-$VER.jar               bundle/
+          cp mechanicscore/MechanicsCore-*.jar                 bundle/MechanicsCore-$VER.jar
+          cp resourcepack/WeaponMechanicsResourcePack-*.zip    bundle/
+          cat <<EOF > bundle/README.txt
+          WeaponMechanics $VER
+
+          Installation:
+          1. Place these in your server’s plugins folder:
+             - WeaponMechanics-$VER.jar
+             - MechanicsCore-$VER.jar
+          2. Make sure PacketEvents is installed:
+             https://github.com/retrooper/packetevents
+
+          EOF
+          cd bundle
+          zip -r ../WeaponMechanics.zip *
+
+      - name: Upload bundle artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: WeaponMechanics
+          path: WeaponMechanics.zip
