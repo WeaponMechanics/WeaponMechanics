@@ -145,7 +145,7 @@ jreleaser {
                 create("releaseDeploy") {
                     active.set(Active.RELEASE)
                     url.set("https://central.sonatype.com/api/v1/publisher")
-                    // run ./gradlew mechanicscore-core:publish before deployment
+                    // run ./gradlew weaponmechanics-core:publish before deployment
                     stagingRepository("build/staging-deploy")
                     // Credentials (JRELEASER_MAVENCENTRAL_USERNAME, JRELEASER_MAVENCENTRAL_PASSWORD or JRELEASER_MAVENCENTRAL_TOKEN)
                     // will be picked up from ~/.jreleaser/config.toml
