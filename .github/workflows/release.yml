@@ -35,7 +35,7 @@ jobs:
       - name: Remove -SNAPSHOT from gradle.properties
         run: |
           sed -i \
-            "s|^\(weaponmechanics\.version=\).*|\1${{ steps.ver.outputs.release_version }}|" \
+            "s|^\(version=\).*|\1${{ steps.ver.outputs.release_version }}|" \
             gradle.properties
 
       # 4. Publish to your Maven repo & build the shadow JAR
@@ -77,9 +77,9 @@ jobs:
         run: |
           VER=${{ steps.ver.outputs.release_version }}
           mkdir bundle
-          cp build/libs/WeaponMechanics-$VER.jar               bundle/
-          cp mechanicscore/MechanicsCore-*.jar                 bundle/MechanicsCore-$VER.jar
-          cp resourcepack/WeaponMechanicsResourcePack-*.zip    bundle/
+          cp weaponmechanics-build/build/libs/WeaponMechanics-$VER.jar bundle/
+          cp mechanicscore/MechanicsCore-*.jar                         bundle/MechanicsCore-$VER.jar
+          cp resourcepack/WeaponMechanicsResourcePack-*.zip            bundle/
           cat <<EOF > bundle/README.txt
           WeaponMechanics $VER
 
