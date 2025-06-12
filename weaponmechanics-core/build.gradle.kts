@@ -7,13 +7,6 @@ plugins {
     id("org.jreleaser") version "1.18.0"
 }
 
-configurations {
-    // Exclude kotlin initially so it is not included in the shadowJar
-    implementation {
-        exclude(group = "org.jetbrains.kotlin", module = "kotlin-stdlib")
-    }
-}
-
 dependencies {
     // Core Minecraft dependencies
     compileOnly(libs.spigotApi)

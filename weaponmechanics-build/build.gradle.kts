@@ -36,6 +36,9 @@ tasks.shadowJar {
 
     val libPackage = "me.deecaad.core.lib"
 
+    // the kotlin plugin adds kotlin-stdlib to the classpath, but we don't want it in the shadow jar
+    exclude("org/jetbrains/kotlin/**")
+
     relocate("org.slf4j", "$libPackage.slf4j")
     relocate("org.bstats", "$libPackage.bstats")
     relocate("net.kyori", "$libPackage.kyori")
