@@ -38,7 +38,7 @@ jobs:
 
       - name: Publish snapshot to Maven
         if: endsWith(steps.get-version.outputs.version, '-SNAPSHOT')
-        run: ./gradlew publish --no-daemon
+        run: ./gradlew publish shadowJar --no-daemon
 
       - name: Release with JReleaser
         if: endsWith(steps.get-version.outputs.version, '-SNAPSHOT')
