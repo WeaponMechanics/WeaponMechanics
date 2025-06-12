@@ -5,7 +5,7 @@ spigotApi = "1.21.4-R0.1-SNAPSHOT"
 packetEvents = "2.8.0"
 
 # External "hooks" or plugins that we might interact with
-geyser = "2.7.0-SNAPSHOT"
+geyser = "2.7.1-SNAPSHOT"
 mechanicsCore = "4.1.0"
 mythicMobs = "5.9.0"
 placeholderApi = "2.11.6"
