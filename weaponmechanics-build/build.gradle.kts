@@ -15,8 +15,8 @@ dependencies {
 }
 
 bukkitPluginYaml {
-    val versionProperty = findProperty("weaponmechanics.version") as? String
-        ?: throw IllegalArgumentException("weaponmechanics.version was null")
+    val versionProperty = findProperty("version") as? String
+        ?: throw IllegalArgumentException("version was null")
 
     main = "me.deecaad.weaponmechanics.WeaponMechanics"
     name = "WeaponMechanics"
@@ -30,8 +30,8 @@ bukkitPluginYaml {
 }
 
 tasks.shadowJar {
-    val versionProperty = findProperty("weaponmechanics.version") as? String
-        ?: throw IllegalArgumentException("weaponmechanics.version was null")
+    val versionProperty = findProperty("version") as? String
+        ?: throw IllegalArgumentException("version was null")
     archiveFileName.set("WeaponMechanics-$versionProperty.jar")
 
     val libPackage = "me.deecaad.core.lib"

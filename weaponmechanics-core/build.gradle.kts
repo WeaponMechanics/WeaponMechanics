@@ -61,7 +61,7 @@ publishing {
 
             groupId = "com.cjcrafter"
             artifactId = "weaponmechanics"
-            version = findProperty("weaponmechanics.version").toString()
+            version = findProperty("version").toString()
 
             pom {
                 name.set("WeaponMechanics")
@@ -111,7 +111,7 @@ jreleaser {
     project {
         name.set("WeaponMechanics")
         group = "com.cjcrafter"
-        version = findProperty("weaponmechanics.version").toString()
+        version = findProperty("version").toString()
         description = "A new age of weapons in Minecraft"
         authors.add("CJCrafter <collinjbarber@gmail.com>")
         authors.add("DeeCaaD <perttu.kangas@hotmail.fi>")
@@ -126,7 +126,7 @@ jreleaser {
         java {
             groupId = "com.cjcrafter"
             artifactId = "weaponmechanics"
-            version = findProperty("weaponmechanics.version").toString()
+            version = findProperty("version").toString()
         }
 
         snapshot {
@@ -172,7 +172,7 @@ jreleaser {
             active.set(Active.ALWAYS)
             distributionType.set(org.jreleaser.model.Distribution.DistributionType.SINGLE_JAR)
             artifact {
-                path.set(file("../weaponmechanics-build/build/libs/WeaponMechanics-${findProperty("weaponmechanics.version")}.jar"))
+                path.set(file("../weaponmechanics-build/build/libs/WeaponMechanics-${findProperty("version")}.jar"))
             }
         }
     }
@@ -183,7 +183,7 @@ jreleaser {
             name.set("WeaponMechanics")
             host.set("github.com")
 
-            val version = findProperty("weaponmechanics.version").toString()
+            val version = findProperty("version").toString()
             val isSnapshot = version.endsWith("-SNAPSHOT")
             releaseName.set(if (isSnapshot) "SNAPSHOT" else "v$version")
             tagName.set("v{{projectVersion}}")

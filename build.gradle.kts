@@ -47,7 +47,7 @@ jreleaser {
     project {
         name.set("WeaponMechanics")
         group = "com.cjcrafter"
-        version = findProperty("weaponmechanics.version").toString()
+        version = findProperty("version").toString()
         description = "A new age of weapons in Minecraft"
         authors.add("CJCrafter <collinjbarber@gmail.com>")
         authors.add("DeeCaaD <perttu.kangas@hotmail.fi>")
@@ -56,7 +56,7 @@ jreleaser {
         java {
             groupId = "com.cjcrafter"
             artifactId = "weaponmechanics"
-            version = findProperty("weaponmechanics.version").toString()
+            version = findProperty("version").toString()
         }
     }
 
