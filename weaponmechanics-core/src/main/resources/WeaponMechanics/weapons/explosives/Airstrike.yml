@@ -1,0 +1,112 @@
+Airstrike:
+  Info:
+    Weapon_Item:
+      Type: "REDSTONE_TORCH"
+      Name: "<gold>Airstrike"
+      Lore:
+        - "<gray>Calls in an airstrike at the flare position."
+        - ""
+        - "<gray>Weapon Statistics"
+        - "<gold>➣<gray> 3 <gold>⟸ <gray>Layers"
+        - "<gold>➣<gray> 8-10 <gold>⟸ <gray>Bombs per layer"
+        - "<gold>➣<gray> 5 <gold>⟸ <gray>Explosion radius"
+      Unbreakable: true
+      Hide_Flags: true
+      Deny_Use_In_Crafting: true
+    Weapon_Get_Mechanics:
+      - "Sound{sound=item.armor.equip_chain, pitch=0.75}"
+    Cancel:
+      Block_Interactions: true
+      Item_Interactions: true
+  Projectile:
+    Projectile_Settings:
+      Type: "DROPPED_ITEM"
+      Projectile_Item_Or_Block:
+        Type: "REDSTONE_TORCH"
+      Disable_Entity_Collisions: true
+    Bouncy:
+      Maximum_Bounce_Amount: -1
+      Blocks:
+        Allow_Any: true
+        Default_Speed_Multiplier: 0.6
+      Rolling:
+        Required_Motion_To_Start_Rolling: 6
+        Blocks:
+          Allow_Any: true
+          Default_Speed_Multiplier: 0.9
+          List:
+            - "$_ICE 0.99"
+            - "ICE 0.99"
+    Mechanics:
+      - "Sound{sound=entity.firework_rocket.launch, volume=6, pitch=1.8, delayBeforePlay=100} @Target{}"
+  Shoot:
+    Trigger:
+      Main_Hand: "RIGHT_CLICK"
+      Off_Hand: "RIGHT_CLICK"
+      Circumstance:
+        Swimming: "DENY"
+    Projectile_Speed: 36
+    Delay_Between_Shots: 20
+    Consume_Item_On_Shoot: true
+    Mechanics:
+      - "Sound{sound=entity.egg.throw, volume=0.5, noise=0.1}"
+  Damage:
+    Base_Explosion_Damage: 7
+    Fire_Ticks: 60
+    Armor_Damage: 4
+    Mechanics:
+      - "Potion{potion=nausea, time=200, level=3, particles=HIDE} @Target{}"
+  Explosion:
+    Explosion_Exposure: "VOID"
+    Explosion_Shape: "SPHERE"
+    Explosion_Type_Data:
+      Radius: 5
+    Detonation:
+      Delay_After_Impact: 100
+      Remove_Projectile_On_Detonation: true
+      Impact_When:
+        Spawn: true
+    Airstrike:
+      Dropped_Projectile:
+        Projectile_Settings:
+          Type: "PRIMED_TNT"
+        Disable_Entity_Collisions: true
+      Minimum_Bombs: 8
+      Maximum_Bombs: 10
+      Height: 90
+      Vertical_Randomness: 4
+      Distance_Between_Bombs: 3
+      Maximum_Distance_From_Center: 32
+      Layers: 3
+      Delay_Between_Layers: 30
+      Detonation:
+        Impact_When:
+          Block: true
+    Block_Damage:
+      Spawn_Falling_Block_Chance: 0.24
+      Default_Mode: BREAK
+      Blocks:
+        - "BEDROCK cancel"
+        - "$WATER cancel"  # stationary_water and moving_water
+        - "OBSIDIAN cancel"
+        - "$LAVA cancel"  # stationary_lava and moving_lava
+    Regeneration:
+      Ticks_Before_Start: 300
+      Max_Blocks_Per_Update: 5
+      Ticks_Between_Updates: 5
+    Mechanics:
+      - "CustomSound{sound=explosion.frag, volume=6, noise=0.1} @Target{}"
+
+  # The following options are added by WeaponMechanicsCosmetics, and you will
+  # not see the changes take effect until you purchase it.
+
+  Cosmetics:
+    Splash_Mechanics:
+      - "Sound{sound=entity.generic.splash, pitch=1.85, noise=0.15} @Target{}"
+      - "Particle{particle=WATER_SPLASH, count=20, noise=0.2 0.2 0.2} @Target{}"
+
+  Trail:
+    Distance_Between_Particles: 0.3
+    Particle_Chooser: LOOP
+    Particles:
+      - "Particle{particle=FLAME}"

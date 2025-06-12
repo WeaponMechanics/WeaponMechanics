@@ -1,42 +1,38 @@
 pluginManagement {
     repositories {
         gradlePluginPortal()
-        mavenLocal()
         maven("https://repo.papermc.io/repository/maven-public/")
     }
 }
 
-// Include every module
-include(":WeaponMechanics")
-include(":MechanicsCore")
-include(":BuildMechanicsCore")
-include(":BuildWeaponMechanics")
-
-include(":CoreCompatibility")
-include(":WorldGuardV7")
-
-// All projects in the non-root directory need to have their directories updates.
-
-project(":WorldGuardV7").projectDir = file("CoreCompatibility/WorldGuardV7")
-
-/**
- * Utility function to add all compatibility modules of a given type.
- *
- * @param type Either "Core" or "Weapon"
- */
-fun compatibility(type: String) {
-    var addedOne = false
-    file("${type}Compatibility").listFiles()?.forEach {
-        if (it.isDirectory && it.name.matches(Regex("${type}_\\d+_\\d+_R\\d+"))) {
-            include(":${it.name}")
-            project(":${it.name}").projectDir = file("${type}Compatibility/${it.name}")
-            addedOne = true
-        }
-    }
-    if (!addedOne)
-        throw IllegalArgumentException("No ${type}Compatibility modules found!")
+plugins {
+    // Apply the foojay-resolver plugin to allow automatic download of JDKs
+    id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
 }
 
-// Add all compatibility modules
-compatibility("Core")
-compatibility("Weapon")
+dependencyResolutionManagement {
+    //repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        mavenCentral()
+        maven(url = "https://central.sonatype.com/repository/maven-snapshots/") // MechanicsCore Snapshots
+        maven(url = "https://hub.spigotmc.org/nexus/content/repositories/snapshots/") // Spigot API
+        maven(url = "https://s01.oss.sonatype.org/content/repositories/snapshots/") // Adventure Snapshots
+        maven(url = "https://repo.extendedclip.com/content/repositories/placeholderapi/") // PlaceholderAPI
+        maven(url = "https://mvn.lumine.io/repository/maven-public/") // MythicMobs
+        maven(url = "https://repo.opencollab.dev/main/") // GeyserMC
+        maven(url = "https://repo.jeff-media.com/public/") // SpigotUpdateChecker
+        maven(url = "https://repo.codemc.org/repository/maven-public/") // NBTAPI from CommandAPI
+        maven(url = "https://repo.codemc.io/repository/maven-releases/") // PacketEvents
+    }
+}
+
+rootProject.name = "WeaponMechanics"
+
+include("weaponmechanics-build")
+include("weaponmechanics-core")
+
+file("./weaponmechanics-platforms/paper").listFiles()?.filter { it.isDirectory }?.forEach { subDir ->
+    val subProjectName = subDir.name
+    include(":$subProjectName")
+    project(":$subProjectName").projectDir = subDir
+}

@@ -1,0 +1,52 @@
+name: Publish Snapshot
+
+on:
+  push:
+    # any branch in this repo
+    branches:
+      - '**'
+
+jobs:
+  publish-snapshot:
+    runs-on: ubuntu-latest
+    environment: Gradle Deploy
+    permissions:
+      contents: write
+    if: "!endsWith(github.actor, '[bot]')"
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history for accurate version extraction
+
+      - name: Set up Java 21 & cache Gradle
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: gradle
+          server-id: stagingDeploy
+          settings-path: ${{ github.workspace }}
+
+      - name: Extract project version
+        id: get-version
+        run: |
+          echo "version=$(./gradlew -q properties \
+            | grep '^version:' \
+            | awk '{print $2}')" >> $GITHUB_OUTPUT
+
+      - name: Publish snapshot to Maven
+        if: endsWith(steps.get-version.outputs.version, '-SNAPSHOT')
+        run: ./gradlew publish --no-daemon
+
+      - name: Release with JReleaser
+        if: endsWith(steps.get-version.outputs.version, '-SNAPSHOT')
+        run: ./gradlew jreleaserRelease --no-daemon --no-configuration-cache
+        env:
+          JRELEASER_GITHUB_TOKEN: ${{ secrets.JRELEASER_GITHUB_TOKEN }}
+          JRELEASER_GPG_PASSPHRASE: ${{ secrets.JRELEASER_GPG_PASSPHRASE }}
+          JRELEASER_GPG_PUBLIC_KEY: ${{ secrets.JRELEASER_GPG_PUBLIC_KEY }}
+          JRELEASER_GPG_SECRET_KEY: ${{ secrets.JRELEASER_GPG_SECRET_KEY }}
+          JRELEASER_NEXUS2_SONATYPESNAPSHOTS_TOKEN: ${{ secrets.JRELEASER_NEXUS2_SONATYPESNAPSHOTS_TOKEN }}
+          JRELEASER_NEXUS2_SONATYPESNAPSHOTS_USERNAME: ${{ secrets.JRELEASER_NEXUS2_SONATYPESNAPSHOTS_USERNAME }}

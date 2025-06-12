@@ -1,0 +1,290 @@
+Fatman:
+  Info:
+    Weapon_Item:
+      Type: "FEATHER"
+      Name: "<gold>Fatman"
+      Lore:
+        - "<gray>Shoulder-mounted unguided nuclear missile catapult."
+        - ""
+        - "<gray>Weapon Statistics <gold>-<gray> 62.5"
+        - "<gold>➣<gray> 38 <gold>⟸ <gray>Accuracy"
+        - "<gold>➣<gray> 98 <gold>⟸ <gray>Damage"
+        - "<gold>➣<gray> 23 <gold>⟸ <gray>Range"
+        - "<gold>➣<gray> 18 <gold>⟸ <gray>Fire Rate"
+        - "<gold>➣<gray> 39 <gold>⟸ <gray>Mobility"
+        - "<gold>➣<gray> 36 <gold>⟸ <gray>Control"
+      Unbreakable: true
+      Hide_Flags: true
+      Attributes:
+        - "movement_speed -0.02855"
+      Deny_Use_In_Crafting: true
+    Weapon_Info_Display:
+      Action_Bar:
+        Message: "<gold>Fatman <gray>«<gold><ammo_left><gray>»<gold><reload>"
+    Weapon_Get_Mechanics:
+      - "Sound{sound=item.armor.equip_chain, pitch=0.75, listeners=Source{}}"
+    Weapon_Equip_Delay: 40
+    Cancel:
+      Drop_Item: true
+      Arm_Swing_Animation: true
+      Break_Blocks: true
+      Swap_Hands: true
+  Skin:
+    Default: 16
+    Scope: ADD 1000
+    Sprint: ADD 2000
+    Reload: ADD 4000
+    No_Ammo: ADD 4000
+  Projectile: "fatman_projectile"
+  Shoot:
+    Trigger:
+      Main_Hand: "RIGHT_CLICK"
+      Off_Hand: "RIGHT_CLICK"
+      Circumstance:
+        Swimming: "DENY"
+        Sprinting: "DENY"
+        Dual_Wielding: "DENY"
+    Projectile_Speed: 32
+    Spread:
+      Base_Spread: 7.8
+      Modify_Spread_When:
+        Zooming: 50%
+        Sneaking: 50%
+        In_Midair: 150%
+    Recoil:
+      Mean_X: 0.0
+      Mean_Y: 3.5
+      Variance_X: 0.2
+      Variance_Y: 0.4
+      Speed: 4.0
+      Damping: 0.2
+      Damping_Recovery: 0.3
+      Smoothing: 0.3
+      Max_Accumulation: 25.0
+    Mechanics:
+      - "CustomSound{sound=shoot.fatman.loud, volume=6, noise=0.1}"
+  Reload:
+    Trigger:
+      Main_Hand: "DROP_ITEM"
+      Off_Hand: "DROP_ITEM"
+    Magazine_Size: 1
+    Reload_Duration: 104
+    Start_Mechanics:
+      - "Sound{sound=block.note_block.hat, volume=0.5, noise=0.1}"
+      - "Sound{sound=block.piston.contract, volume=0.5, noise=0.1, delayBeforePlay=2}"
+      - "Sound{sound=item.flintandsteel.use, volume=0.5, pitch=1.5, delayBeforePlay=55}"
+      - "Sound{sound=item.flintandsteel.use, volume=0.5, pitch=1.7, delayBeforePlay=57}"
+      - "Sound{sound=item.flintandsteel.use, volume=0.5, pitch=1.9, delayBeforePlay=59}"
+      - "Sound{sound=block.piston.extend, volume=0.5, noise=0.1, delayBeforePlay=101}"
+  Damage:
+    Base_Damage: 12.2
+    Base_Explosion_Damage: 18.2
+    Fire_Ticks: 40
+    Armor_Damage: 4
+    Mechanics:
+      - "Potion{potion=WITHER, time=160, level=2, particles=HIDE} @Target{}"
+      - "Potion{potion=nausea, time=200, level=3, particles=HIDE} @Target{}"
+  Explosion:
+    Explosion_Exposure: "OPTIMIZED"
+    Explosion_Shape: "DEFAULT"
+    Explosion_Type_Data:
+      Yield: 8.9
+    Detonation:
+      Impact_When:
+        Entity: true
+        Block: true
+    Block_Damage:
+      Spawn_Falling_Block_Chance: 0.55
+      Default_Mode: BREAK
+      Blocks:
+        - "BEDROCK cancel"
+        - "$WATER cancel"  # stationary_water and moving_water
+        - "OBSIDIAN cancel"
+        - "$LAVA cancel"  # stationary_lava and moving_lava
+    Regeneration:
+      Ticks_Before_Start: 400
+      Max_Blocks_Per_Update: 4
+      Ticks_Between_Updates: 5
+  Scope:
+    Trigger:
+      Main_Hand: "LEFT_CLICK"
+      Off_Hand: "LEFT_CLICK"
+    Zoom_Amount: 1.22
+    Shoot_Delay_After_Scope: 24
+    Mechanics:
+      - "CustomSound{sound=scope.in, volume=0.5, pitch=0.9, noise=0.1, listeners=Source{}}"
+    Zoom_Off:
+      Mechanics:
+        - "CustomSound{sound=scope.out, volume=0.5, pitch=0.9, noise=0.1, listeners=Source{}}"
+
+  # The following options are added by WeaponMechanicsPlus, and you will not
+  # see the changes take effect until you purchase it.
+  Fire_Mode:
+    Trigger:
+      Main_Hand: "swap_hands"
+      Off_Hand: "swap_hands"
+    Mechanics:
+      - "Sound{sound=item.flintandsteel.use, volume=0.5, pitch=1.5}"
+    Order:
+      - "Fatman"
+      - "Fatman_Rock rock" # The "rock" parameter makes it so that the Fatman_Rock uses a different ammo pool
+
+  # The following options are added by WeaponMechanicsCosmetics, and you will
+  # not see the changes take effect until you purchase it.
+
+  Cosmetics:
+    Splash_Mechanics:
+      - "Sound{sound=entity.generic.splash, pitch=1.85, noise=0.15} @Target{}"
+      - "Particle{particle=WATER_SPLASH, count=20, noise=0.2 0.2 0.2} @Target{}"
+    Third_Person_Pose:
+      Default: NONE
+      Scope: BOW
+      Reload: BLOCK
+      Firearm_Action: CROSSBOW
+
+  Trail:
+    Distance_Between_Particles: 1.0
+    Particle_Chooser: LOOP
+    Particles:
+      - "Particle{particle=SMOKE_NORMAL, count=3, noise=0.01 0.01 0.01}"
+
+  Show_Time:
+    Reload:
+      Item_Cooldown: true
+      Exp: true
+      Boss_Bar:
+        Message: "<gray>Reloading %time%s"
+        Color: YELLOW
+        Style: PROGRESS
+    Weapon_Equip_Delay:
+      Item_Cooldown: true
+    Shoot_Delay_After_Scope:
+      Item_Cooldown: true
+
+
+# This additional weapon is a firemode, which is added by WeaponMechanicsPlus. You will not be able to 
+# use this feature (properly) until you have purchased and installed WeaponMechanicsPlus. 
+Fatman_Rock:
+  Info:
+    Weapon_Item:
+      Type: "FEATHER"
+      Name: "<gold>Fatman"
+      Lore:
+        - "<gray>Shoulder-mounted unguided rock catapult."
+        - ""
+        - "<gray>Weapon Statistics <gold>-<gray> 62.5"
+        - "<gold>➣<gray> 38 <gold>⟸ <gray>Accuracy"
+        - "<gold>➣<gray> 98 <gold>⟸ <gray>Damage"
+        - "<gold>➣<gray> 23 <gold>⟸ <gray>Range"
+        - "<gold>➣<gray> 18 <gold>⟸ <gray>Fire Rate"
+        - "<gold>➣<gray> 39 <gold>⟸ <gray>Mobility"
+        - "<gold>➣<gray> 36 <gold>⟸ <gray>Control"
+      Unbreakable: true
+      Hide_Flags: true
+      Attributes:
+        - "movement_speed -0.02855"
+      Deny_Use_In_Crafting: true
+    Weapon_Info_Display:
+      Action_Bar:
+        Message: "<gold>Fatman <gray>«<gold><ammo_left><gray>»<gold><reload>"
+    Weapon_Get_Mechanics:
+      - "Sound{sound=item.armor.equip_chain, pitch=0.75, listeners=Source{}}"
+    Weapon_Equip_Delay: 40
+    Cancel:
+      Drop_Item: true
+      Arm_Swing_Animation: true
+      Break_Blocks: true
+      Swap_Hands: true
+  Skin:
+    Default: 17
+    Scope: ADD 1000
+    Sprint: ADD 2000
+    Reload: ADD 4000
+    No_Ammo: ADD 4000
+  Projectile: "fatman_rock_projectile"
+  Shoot:
+    Trigger:
+      Main_Hand: "RIGHT_CLICK"
+      Off_Hand: "RIGHT_CLICK"
+      Circumstance:
+        Swimming: "DENY"
+        Sprinting: "DENY"
+        Dual_Wielding: "DENY"
+    Projectile_Speed: 32
+    Spread:
+      Base_Spread: 7.8
+      Modify_Spread_When:
+        Zooming: 50%
+        Sneaking: 50%
+        In_Midair: 150%
+    Recoil:
+      Mean_X: 0.0
+      Mean_Y: 3.5
+      Variance_X: 0.2
+      Variance_Y: 0.4
+      Speed: 4.0
+      Damping: 0.2
+      Damping_Recovery: 0.3
+      Smoothing: 0.3
+      Max_Accumulation: 25.0
+    Mechanics:
+      - "CustomSound{sound=shoot.fatman.loud, volume=6, noise=0.1}"
+  Reload:
+    Trigger:
+      Main_Hand: "DROP_ITEM"
+      Off_Hand: "DROP_ITEM"
+    Magazine_Size: 1
+    Reload_Duration: 104
+    Start_Mechanics:
+      - "Sound{sound=block.note_block.hat, volume=0.5, noise=0.1}"
+      - "Sound{sound=block.piston.contract, volume=0.5, noise=0.1, delayBeforePlay=2}"
+      - "Sound{sound=item.flintandsteel.use, volume=0.5, pitch=1.5, delayBeforePlay=55}"
+      - "Sound{sound=item.flintandsteel.use, volume=0.5, pitch=1.7, delayBeforePlay=57}"
+      - "Sound{sound=item.flintandsteel.use, volume=0.5, pitch=1.9, delayBeforePlay=59}"
+      - "Sound{sound=block.piston.extend, volume=0.5, noise=0.1, delayBeforePlay=101}"
+  Damage:
+    Base_Damage: 27
+    Armor_Damage: 8
+  Scope:
+    Trigger:
+      Main_Hand: "LEFT_CLICK"
+      Off_Hand: "LEFT_CLICK"
+    Zoom_Amount: 1.22
+    Shoot_Delay_After_Scope: 24
+    Mechanics:
+      - "CustomSound{sound=scope.in, volume=0.5, pitch=0.9, noise=0.1, listeners=Source{}}"
+    Zoom_Off:
+      Mechanics:
+        - "CustomSound{sound=scope.out, volume=0.5, pitch=0.9, noise=0.1, listeners=Source{}}"
+
+  # The following options are added by WeaponMechanicsCosmetics, and you will
+  # not see the changes take effect until you purchase it.
+
+  Cosmetics:
+    Splash_Mechanics:
+      - "Sound{sound=entity.generic.splash, pitch=1.85, noise=0.15} @Target{}"
+      - "Particle{particle=WATER_SPLASH, count=20, noise=0.2 0.2 0.2} @Target{}"
+    Third_Person_Pose:
+      Default: NONE
+      Scope: BOW
+      Reload: BLOCK
+      Firearm_Action: CROSSBOW
+
+  Trail:
+    Distance_Between_Particles: 1.0
+    Particle_Chooser: LOOP
+    Particles:
+      - "Particle{particle=SMOKE_NORMAL, count=3, noise=0.01 0.01 0.01}"
+
+  Show_Time:
+    Reload:
+      Item_Cooldown: true
+      Exp: true
+      Boss_Bar:
+        Message: "<gray>Reloading <time>s"
+        Color: YELLOW
+        Style: PROGRESS
+    Weapon_Equip_Delay:
+      Item_Cooldown: true
+    Shoot_Delay_After_Scope:
+      Item_Cooldown: true
