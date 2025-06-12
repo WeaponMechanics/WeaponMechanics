@@ -1,7 +1,7 @@
 plugins {
     `java-library`
     id("com.gradleup.shadow") version "8.3.5"
-    id("xyz.jpenilla.resource-factory-bukkit-convention") version "1.2.0"
+    id("xyz.jpenilla.resource-factory-bukkit-convention") version "1.3.0"
 }
 
 dependencies {
