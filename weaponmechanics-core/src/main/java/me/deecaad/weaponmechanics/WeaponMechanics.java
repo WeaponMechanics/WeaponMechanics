@@ -140,6 +140,7 @@ public class WeaponMechanics extends MechanicsPlugin {
         }
     }
 
+    @Override
     public void onEnable() {
         super.onEnable();
 
@@ -164,6 +165,7 @@ public class WeaponMechanics extends MechanicsPlugin {
         }
     }
 
+    @Override
     public @NotNull CompletableFuture<Void> handleCommands() {
         WeaponMechanicsCommand.registerCommands();
         return super.handleCommands();
@@ -406,6 +408,7 @@ public class WeaponMechanics extends MechanicsPlugin {
                 });
     }
 
+    @Override
     public void onDisable() {
         // Try to unregister events, just in case this is a reload and not a
         // full plugin disable (in which case this would be done already).
