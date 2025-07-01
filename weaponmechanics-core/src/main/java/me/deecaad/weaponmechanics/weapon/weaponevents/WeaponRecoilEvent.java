@@ -22,6 +22,7 @@ public class WeaponRecoilEvent extends WeaponEvent implements Cancellable {
     private float dampingRecovery;
     private float smoothingFactor;
     private float maxRecoilAccum;
+    private float recoveryPercentage;
 
     private boolean isCancelled;
 
@@ -42,6 +43,7 @@ public class WeaponRecoilEvent extends WeaponEvent implements Cancellable {
         this.dampingRecovery = recoilProfile.getDampingRecovery();
         this.smoothingFactor = recoilProfile.getSmoothingFactor();
         this.maxRecoilAccum = recoilProfile.getMaxRecoilAccum();
+        this.recoveryPercentage = recoilProfile.getRecoveryPercentage();
     }
 
     public float getRecoilMeanX() {
@@ -114,6 +116,14 @@ public class WeaponRecoilEvent extends WeaponEvent implements Cancellable {
 
     public void setMaxRecoilAccum(float maxRecoilAccum) {
         this.maxRecoilAccum = maxRecoilAccum;
+    }
+
+    public float getRecoveryPercentage() {
+        return recoveryPercentage;
+    }
+
+    public void setRecoveryPercentage(float recoveryPercentage) {
+        this.recoveryPercentage = recoveryPercentage;
     }
 
     @Override
