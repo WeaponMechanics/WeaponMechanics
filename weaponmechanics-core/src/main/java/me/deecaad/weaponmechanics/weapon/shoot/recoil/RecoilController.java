@@ -40,6 +40,11 @@ public class RecoilController implements Consumer<TaskImplementation<Void>> {
     private float targetRecoilX = 0f;
     private float targetRecoilY = 0f;
 
+    // Recovery info
+    private float residualBaseRecoilX = 0f;
+    private float residualBaseRecoilY = 0f;
+    private float recoveryPercentage = 1f;  // 1.0 means 100% recovery, 0.0 means no recovery
+
     public RecoilController(@NotNull Player player) {
         this.player = player;
     }
@@ -66,6 +71,7 @@ public class RecoilController implements Consumer<TaskImplementation<Void>> {
             smoothingFactor = event.getSmoothingFactor();
             dampingRecovery = event.getDampingRecovery();
             recoilSpeed = event.getRecoilSpeed();
+            recoveryPercentage = event.getRecoveryPercentage();
 
             dx = RandomUtil.variance(event.getRecoilMeanX(), event.getRecoilVarianceX());
             dy = RandomUtil.variance(event.getRecoilMeanY(), event.getRecoilVarianceY());
@@ -75,6 +81,7 @@ public class RecoilController implements Consumer<TaskImplementation<Void>> {
             smoothingFactor = recoil.getSmoothingFactor();
             dampingRecovery = recoil.getDampingRecovery();
             recoilSpeed = recoil.getRecoilSpeed();
+            recoveryPercentage = recoil.getRecoveryPercentage();
 
             dx = RandomUtil.variance(recoil.getRecoilMeanX(), recoil.getRecoilVarianceX());
             dy = RandomUtil.variance(recoil.getRecoilMeanY(), recoil.getRecoilVarianceY());
@@ -90,6 +97,10 @@ public class RecoilController implements Consumer<TaskImplementation<Void>> {
             targetRecoilX *= scale;
             targetRecoilY *= scale;
         }
+
+        // Snapshot of the current recoil to use for recovery
+        residualBaseRecoilX = targetRecoilX;
+        residualBaseRecoilY = targetRecoilY;
     }
 
     @Override
@@ -113,8 +124,10 @@ public class RecoilController implements Consumer<TaskImplementation<Void>> {
 
         // RECOVERY - pull the recoil back towards zero
         if (!approximately(dampingRecovery, 0f)) {
-            currentRecoilX = moveTowards(currentRecoilX, 0f, dampingRecovery);
-            currentRecoilY = moveTowards(currentRecoilY, 0f, dampingRecovery);
+            float recoveryTargetX = residualBaseRecoilX * (1f - recoveryPercentage);
+            float recoveryTargetY = residualBaseRecoilY * (1f - recoveryPercentage);
+            currentRecoilX = moveTowards(currentRecoilX, recoveryTargetX, dampingRecovery);
+            currentRecoilY = moveTowards(currentRecoilY, recoveryTargetY, dampingRecovery);
         }
 
         // Use the difference between old and new for the final camera delta
