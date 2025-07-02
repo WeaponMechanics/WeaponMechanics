@@ -11,8 +11,8 @@ mythicMobs = "5.9.0"
 placeholderApi = "2.11.6"
 vault = "1.7.1"
 vivecraft = "3.1.0"
-worldedit = "7.4.0-SNAPSHOT"
-worldguard = "7.0.13-SNAPSHOT"
+worldedit = "7.3.14"
+worldguard = "7.0.14"
 
 # Shaded dependencies
 adventureApi = "4.23.0"
