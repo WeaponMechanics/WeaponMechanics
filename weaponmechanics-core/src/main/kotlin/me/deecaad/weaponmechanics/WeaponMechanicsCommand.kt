@@ -1354,7 +1354,7 @@ object WeaponMechanicsCommand {
         val recoil =
             RecoilProfile(
                 recoilMeanX, recoilMeanY, recoilVarianceX, recoilVarianceY, recoilSpeed,
-                damping, dampingRecovery, smoothingFactor, maxRecoilAccum,
+                damping, dampingRecovery, smoothingFactor, maxRecoilAccum, 1f
             )
         val controller = playerWrapper.recoilController
 

@@ -22,6 +22,7 @@ public class RecoilProfile implements Serializer<RecoilProfile> {
     private float dampingRecovery;
     private float smoothingFactor;
     private float maxRecoilAccum;
+    private float recoveryPercentage;
 
     /**
      * Default constructor for serializer.
@@ -38,7 +39,8 @@ public class RecoilProfile implements Serializer<RecoilProfile> {
         float damping,
         float dampingRecovery,
         float smoothingFactor,
-        float maxRecoilAccum) {
+        float maxRecoilAccum,
+        float recoveryPercentage) {
         this.recoilMeanX = recoilMeanX;
         this.recoilMeanY = recoilMeanY;
         this.recoilVarianceX = recoilVarianceX;
@@ -48,6 +50,7 @@ public class RecoilProfile implements Serializer<RecoilProfile> {
         this.dampingRecovery = dampingRecovery;
         this.smoothingFactor = smoothingFactor;
         this.maxRecoilAccum = maxRecoilAccum;
+        this.recoveryPercentage = recoveryPercentage;
     }
 
     public float getRecoilMeanX() {
@@ -86,6 +89,10 @@ public class RecoilProfile implements Serializer<RecoilProfile> {
         return maxRecoilAccum;
     }
 
+    public float getRecoveryPercentage() {
+        return recoveryPercentage;
+    }
+
     @Override
     public @Nullable String getKeyword() {
         return "Recoil";
@@ -113,6 +120,7 @@ public class RecoilProfile implements Serializer<RecoilProfile> {
         float dampingRecovery = (float) data.of("Damping_Recovery").assertRange(0.0, 1.0).getDouble().orElse(0.0);
         float smoothingFactor = (float) data.of("Smoothing").assertRange(0.0, 1.0).getDouble().orElse(0.5);
         float maxRecoilAccum = (float) data.of("Max_Accumulation").getDouble().orElse(360);
+        float recoveryPercentage = (float) data.of("Recovery_Percentage").assertRange(0.0, 1.0).getDouble().orElse(0.5);
 
         return new RecoilProfile(
             recoilMeanX,
@@ -123,6 +131,7 @@ public class RecoilProfile implements Serializer<RecoilProfile> {
             damping,
             dampingRecovery,
             smoothingFactor,
-            maxRecoilAccum);
+            maxRecoilAccum,
+            recoveryPercentage);
     }
 }
