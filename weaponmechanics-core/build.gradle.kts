@@ -149,6 +149,7 @@ jreleaser {
                     stagingRepository("build/staging-deploy")
                     // Credentials (JRELEASER_MAVENCENTRAL_USERNAME, JRELEASER_MAVENCENTRAL_PASSWORD or JRELEASER_MAVENCENTRAL_TOKEN)
                     // will be picked up from ~/.jreleaser/config.toml
+                    maxRetries = 200
                 }
             }
 

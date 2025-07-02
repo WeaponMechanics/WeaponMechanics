@@ -38,22 +38,8 @@ jobs:
             "s|^\(version=\).*|\1${{ steps.ver.outputs.release_version }}|" \
             gradle.properties
 
-      # 4. Publish to your Maven repo & build the shadow JAR
       - name: Assemble and create local maven repository
         run: ./gradlew publish shadowJar --no-daemon
-
-      # 5. Create the GitHub release via JReleaser
-      - name: Release with JReleaser
-        env:
-          JRELEASER_GITHUB_TOKEN: ${{ secrets.JRELEASER_GITHUB_TOKEN }}
-          JRELEASER_GPG_PASSPHRASE: ${{ secrets.JRELEASER_GPG_PASSPHRASE }}
-          JRELEASER_GPG_PUBLIC_KEY: ${{ secrets.JRELEASER_GPG_PUBLIC_KEY }}
-          JRELEASER_GPG_SECRET_KEY: ${{ secrets.JRELEASER_GPG_SECRET_KEY }}
-          JRELEASER_MAVENCENTRAL_TOKEN: ${{ secrets.JRELEASER_MAVENCENTRAL_TOKEN }}
-          JRELEASER_MAVENCENTRAL_USERNAME: ${{ secrets.JRELEASER_MAVENCENTRAL_USERNAME }}
-          JRELEASER_NEXUS2_SONATYPESNAPSHOTS_TOKEN: ${{ secrets.JRELEASER_NEXUS2_SONATYPESNAPSHOTS_TOKEN }}
-          JRELEASER_NEXUS2_SONATYPESNAPSHOTS_USERNAME: ${{ secrets.JRELEASER_NEXUS2_SONATYPESNAPSHOTS_USERNAME }}
-        run: ./gradlew jreleaserRelease --no-daemon --no-configuration-cache
 
       - name: Fetch latest ResourcePack
         uses: robinraju/release-downloader@v1
@@ -100,3 +86,15 @@ jobs:
           name: WeaponMechanics
           path: WeaponMechanics.zip
           if-no-files-found: error
+
+      - name: Release with JReleaser
+        env:
+          JRELEASER_GITHUB_TOKEN: ${{ secrets.JRELEASER_GITHUB_TOKEN }}
+          JRELEASER_GPG_PASSPHRASE: ${{ secrets.JRELEASER_GPG_PASSPHRASE }}
+          JRELEASER_GPG_PUBLIC_KEY: ${{ secrets.JRELEASER_GPG_PUBLIC_KEY }}
+          JRELEASER_GPG_SECRET_KEY: ${{ secrets.JRELEASER_GPG_SECRET_KEY }}
+          JRELEASER_MAVENCENTRAL_TOKEN: ${{ secrets.JRELEASER_MAVENCENTRAL_TOKEN }}
+          JRELEASER_MAVENCENTRAL_USERNAME: ${{ secrets.JRELEASER_MAVENCENTRAL_USERNAME }}
+          JRELEASER_NEXUS2_SONATYPESNAPSHOTS_TOKEN: ${{ secrets.JRELEASER_NEXUS2_SONATYPESNAPSHOTS_TOKEN }}
+          JRELEASER_NEXUS2_SONATYPESNAPSHOTS_USERNAME: ${{ secrets.JRELEASER_NEXUS2_SONATYPESNAPSHOTS_USERNAME }}
+        run: ./gradlew jreleaserRelease --no-daemon --no-configuration-cache

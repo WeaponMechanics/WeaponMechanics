@@ -1,9 +1,6 @@
 package me.deecaad.weaponmechanics.weapon.trigger;
 
-import me.deecaad.core.file.Configuration;
-import me.deecaad.core.file.SerializeData;
-import me.deecaad.core.file.Serializer;
-import me.deecaad.core.file.SerializerException;
+import me.deecaad.core.file.*;
 import me.deecaad.weaponmechanics.WeaponMechanics;
 import me.deecaad.weaponmechanics.wrappers.EntityWrapper;
 import org.bukkit.entity.EntityType;
@@ -13,6 +10,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.MainHand;
 import org.jetbrains.annotations.NotNull;
 
+@SearcherFilter(SearchMode.ON_DEMAND)
 public class Trigger implements Serializer<Trigger> {
 
     private TriggerType mainhand;
