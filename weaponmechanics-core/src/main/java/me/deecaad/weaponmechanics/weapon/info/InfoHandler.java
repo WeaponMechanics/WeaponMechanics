@@ -1,9 +1,6 @@
 package me.deecaad.weaponmechanics.weapon.info;
 
-import me.deecaad.core.file.Configuration;
-import me.deecaad.core.file.IValidator;
-import me.deecaad.core.file.SerializeData;
-import me.deecaad.core.file.SerializerException;
+import me.deecaad.core.file.*;
 import me.deecaad.core.mechanics.CastData;
 import me.deecaad.core.mechanics.MechanicManager;
 import me.deecaad.core.mechanics.Mechanics;
@@ -33,6 +30,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+@SearcherFilter(SearchMode.ON_DEMAND)
 public class InfoHandler implements IValidator {
 
     /**

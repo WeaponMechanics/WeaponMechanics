@@ -7,10 +7,7 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEn
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerAbilities;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerRemoveEntityEffect;
 import me.deecaad.core.MechanicsCore;
-import me.deecaad.core.file.Configuration;
-import me.deecaad.core.file.IValidator;
-import me.deecaad.core.file.SerializeData;
-import me.deecaad.core.file.SerializerException;
+import me.deecaad.core.file.*;
 import me.deecaad.core.file.simple.DoubleSerializer;
 import me.deecaad.core.mechanics.CastData;
 import me.deecaad.core.mechanics.MechanicManager;
@@ -45,6 +42,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+@SearcherFilter(SearchMode.ON_DEMAND)
 public class ScopeHandler implements IValidator, TriggerListener {
 
     private WeaponHandler weaponHandler;
