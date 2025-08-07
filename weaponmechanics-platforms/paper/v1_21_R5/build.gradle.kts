@@ -14,5 +14,5 @@ dependencies {
     compileOnly(libs.adventureApi)
     compileOnly(libs.foliaScheduler)
 
-    paperweight.paperDevBundle("1.21.7-R0.1-SNAPSHOT")
+    paperweight.paperDevBundle("1.21.8-R0.1-SNAPSHOT")
 }
