@@ -383,11 +383,12 @@ public class WeaponMechanics extends MechanicsPlugin {
             if (moveTask != null)
                 moveTask.cancel();
         }
+
+        CompletableFuture<TaskImplementation<Void>> wmReload = super.reload();
+
         entityWrappers = new HashMap<>();
         weaponHandler = new WeaponHandler();
         resourcePackListener = new ResourcePackListener();
-
-        // TODO: Use VersionLib
         if (ServerVersions.isFolia()) {
             projectileSpawner = new FoliaProjectileSpawner(this);
         } else {
@@ -396,7 +397,7 @@ public class WeaponMechanics extends MechanicsPlugin {
 
         MechanicsPlugin mechanicsCore = MechanicsCore.getInstance();
         return mechanicsCore.reload()
-                .thenCompose((ignore) -> super.reload())
+                .thenCompose((ignore) -> wmReload)
                 .thenCompose((ignore) -> handleDatabase())
                 .thenCompose((ignore) -> {
                     // Make sure each online player has a wrapper
@@ -442,9 +443,11 @@ public class WeaponMechanics extends MechanicsPlugin {
 
         database = null;
         weaponHandler = null;
-        entityWrappers.clear(); // hint to JVM to free memory
-        entityWrappers = null;
-        weaponConfigurations = null;
+        entityWrappers.clear();
+        weaponConfigurations.clear();
+        ammoConfigurations.clear();
+        projectileConfigurations.clear();
+        repairKitConfigurations.clear();
         projectileSpawner = null;
     }
 
