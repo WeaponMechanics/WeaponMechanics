@@ -867,3 +867,10 @@ Entity_Hitboxes:
     ARMS: true
     LEGS: 0.25
     FEET: 0.10
+  HAPPY_GHAST: # Tentacles aren't part of hitbox
+    Horizontal_Entity: false
+    HEAD: 1.0
+    BODY: 0.0
+    ARMS: false
+    LEGS: 0.0
+    FEET: 0.0

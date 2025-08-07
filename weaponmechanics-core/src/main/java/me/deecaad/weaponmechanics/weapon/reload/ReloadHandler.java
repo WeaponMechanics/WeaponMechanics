@@ -3,10 +3,7 @@ package me.deecaad.weaponmechanics.weapon.reload;
 import com.cjcrafter.foliascheduler.EntitySchedulerImplementation;
 import com.cjcrafter.foliascheduler.TaskImplementation;
 import me.deecaad.core.MechanicsCore;
-import me.deecaad.core.file.Configuration;
-import me.deecaad.core.file.IValidator;
-import me.deecaad.core.file.SerializeData;
-import me.deecaad.core.file.SerializerException;
+import me.deecaad.core.file.*;
 import me.deecaad.core.mechanics.CastData;
 import me.deecaad.core.mechanics.MechanicManager;
 import me.deecaad.core.mechanics.Mechanics;
@@ -44,6 +41,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collections;
 import java.util.List;
 
+@SearcherFilter(SearchMode.ON_DEMAND)
 public class ReloadHandler implements IValidator, TriggerListener {
 
     private WeaponHandler weaponHandler;
