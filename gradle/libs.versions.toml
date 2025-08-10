@@ -6,7 +6,7 @@ packetEvents = "2.8.0"
 
 # External "hooks" or plugins that we might interact with
 geyser = "2.7.2-SNAPSHOT"
-mechanicsCore = "4.1.0"
+mechanicsCore = "4.1.5-SNAPSHOT"
 mythicMobs = "5.9.0"
 placeholderApi = "2.11.6"
 vault = "1.7.1"

@@ -76,9 +76,9 @@ public class WeaponMechanics extends MechanicsPlugin {
 
     private static @Nullable WeaponMechanics INSTANCE;
 
-    private @NotNull Map<LivingEntity, EntityWrapper> entityWrappers;
+    private final @NotNull Map<LivingEntity, EntityWrapper> entityWrappers = new HashMap<>();
     private @Nullable WeaponHandler weaponHandler;
-    private @NotNull ResourcePackListener resourcePackListener;
+    private @Nullable ResourcePackListener resourcePackListener;
     private @Nullable ProjectileSpawner projectileSpawner;
     private @Nullable Database database;
 
@@ -89,9 +89,6 @@ public class WeaponMechanics extends MechanicsPlugin {
 
     public WeaponMechanics() {
         super(null, Style.style(NamedTextColor.GOLD), Style.style(NamedTextColor.GRAY), 14323);
-        entityWrappers = new HashMap<>();
-        weaponHandler = new WeaponHandler();
-        resourcePackListener = new ResourcePackListener();
     }
 
     @Override
@@ -146,12 +143,6 @@ public class WeaponMechanics extends MechanicsPlugin {
 
         handleDatabase();
         handleResourcePack();  // no need to .join() on this... let it run in background
-
-        if (ServerVersions.isFolia()) {
-            projectileSpawner = new FoliaProjectileSpawner(this);
-        } else {
-            projectileSpawner = new SpigotProjectileSpawner(this);
-        }
 
         // Shameless self-promotion
         if (Bukkit.getPluginManager().getPlugin("WeaponMechanicsCosmetics") == null)
@@ -280,7 +271,12 @@ public class WeaponMechanics extends MechanicsPlugin {
         pm.registerEvents(new TriggerEntityListeners(weaponHandler), this);
         pm.registerEvents(new WeaponListeners(weaponHandler), this);
         pm.registerEvents(new ExplosionInteractionListeners(), this);
-        pm.registerEvents(resourcePackListener, this);
+
+        if (resourcePackListener == null) {
+            debugger.warning("Failed to register ResourcePackListener... users will not automatically download the resource pack!");
+        } else {
+            pm.registerEvents(resourcePackListener, this);
+        }
 
         if (pm.isPluginEnabled("MythicMobs")) {
             PluginDescriptionFile desc = pm.getPlugin("MythicMobs").getDescription();
@@ -377,16 +373,19 @@ public class WeaponMechanics extends MechanicsPlugin {
     }
 
     @Override
-    public @NotNull CompletableFuture<TaskImplementation<Void>> reload() {
-        for (EntityWrapper entity : entityWrappers.values()) {
-            TaskImplementation<Void> moveTask = entity.getMoveTask();
-            if (moveTask != null)
-                moveTask.cancel();
+    public void init() {
+        super.init();
+
+        // Cancel running tasks for wrappers before clearing (defensive redundancy)
+        for (EntityWrapper ew : entityWrappers.values()) {
+            TaskImplementation<Void> moveTask = ew.getMoveTask();
+            if (moveTask != null) moveTask.cancel();
+            ew.getMainHandData().cancelTasks();
+            ew.getOffHandData().cancelTasks();
         }
+        entityWrappers.clear();
 
-        CompletableFuture<TaskImplementation<Void>> wmReload = super.reload();
-
-        entityWrappers = new HashMap<>();
+        // Initialize core objects (recreate to ensure a clean state)
         weaponHandler = new WeaponHandler();
         resourcePackListener = new ResourcePackListener();
         if (ServerVersions.isFolia()) {
@@ -394,12 +393,26 @@ public class WeaponMechanics extends MechanicsPlugin {
         } else {
             projectileSpawner = new SpigotProjectileSpawner(this);
         }
+    }
 
-        MechanicsPlugin mechanicsCore = MechanicsCore.getInstance();
-        return mechanicsCore.reload()
-                .thenCompose((ignore) -> wmReload)
+
+    @Override
+    public @NotNull CompletableFuture<TaskImplementation<Void>> reload() {
+        for (EntityWrapper entity : entityWrappers.values()) {
+            TaskImplementation<Void> moveTask = entity.getMoveTask();
+            if (moveTask != null)
+                moveTask.cancel();
+        }
+
+        return MechanicsCore.getInstance().reload()
+                .thenCompose((ignore) -> super.reload())
                 .thenCompose((ignore) -> handleDatabase())
                 .thenCompose((ignore) -> {
+                    if (weaponHandler == null) {
+                        debugger.severe("WeaponHandler is null after reload! This should never happen.");
+                        return CompletableFuture.failedFuture(new IllegalStateException("WeaponHandler is null after reload!"));
+                    }
+
                     // Make sure each online player has a wrapper
                     for (Player player : Bukkit.getOnlinePlayers()) {
                         PlayerWrapper playerWrapper = getPlayerWrapper(player);
@@ -428,7 +441,7 @@ public class WeaponMechanics extends MechanicsPlugin {
         BlockDamageData.regenerateAll();
 
         // Close database and save data in SYNC
-        if (database != null) {
+        if (database != null && weaponHandler != null) {
             for (EntityWrapper entityWrapper : entityWrappers.values()) {
                 if (!entityWrapper.isPlayer())
                     continue;
