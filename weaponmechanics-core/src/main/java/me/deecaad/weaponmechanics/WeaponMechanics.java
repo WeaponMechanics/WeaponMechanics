@@ -84,7 +84,6 @@ public class WeaponMechanics extends MechanicsPlugin {
 
     private @NotNull Configuration ammoConfigurations = new FastConfiguration();
     private @NotNull Configuration projectileConfigurations = new FastConfiguration();
-    private @NotNull Configuration repairKitConfigurations = new FastConfiguration();
     private @NotNull Configuration weaponConfigurations = new FastConfiguration();
 
     public WeaponMechanics() {
@@ -146,7 +145,9 @@ public class WeaponMechanics extends MechanicsPlugin {
 
         // Shameless self-promotion
         if (Bukkit.getPluginManager().getPlugin("WeaponMechanicsCosmetics") == null)
-            debugger.info("Buy WeaponMechanicsCosmetics to support our development: https://www.spigotmc.org/resources/104539/");
+            debugger.info("Buy WeaponMechanicsCosmetics to support our development: https://pluginify.org/resources/13/");
+        if (Bukkit.getPluginManager().getPlugin("WeaponMechanicsPlus") == null)
+            debugger.info("Buy WeaponMechanicsPlus to support our development: https://pluginify.org/resources/14/");
 
         // Detect Vivecraft-Spigot-Extensions and suggest switching to VivecraftSpigot
         if (Bukkit.getPluginManager().getPlugin("Vivecraft_Spigot_Extensions") != null) {
@@ -175,11 +176,16 @@ public class WeaponMechanics extends MechanicsPlugin {
             int connectionTimeout = configuration.getInt("Resource_Pack_Download.Connection_Timeout");
             int readTimeout = configuration.getInt("Resource_Pack_Download.Read_Timeout");
 
-            if ("LATEST".equals(link)) {
-                link = resourcePackListener.getResourcePackLink();
+            ResourcePackListener listener = this.resourcePackListener;
+            if (listener == null) {
+                debugger.warning("ResourcePackListener is not initialized! Cannot download resource pack.");
+                return;
             }
 
             try {
+                if ("LATEST".equals(link))
+                    link = resourcePackListener.getResourcePackLink();
+
                 FileUtil.downloadFile(pack, link, connectionTimeout, readTimeout);
             } catch (Exception e) {
                 // Wrapping in CompletionException causes the returned CompletableFuture to complete exceptionally.
@@ -248,6 +254,7 @@ public class WeaponMechanics extends MechanicsPlugin {
                 database = new SQLite(absolutePath);
             } catch (IOException | SQLException e) {
                 debugger.warning("Failed to initialized database!", e);
+                return CompletableFuture.failedFuture(new CompletionException("Failed to initialize SQLite database", e));
             }
         } else {
             String hostname = configuration.getString("Database.MySQL.Hostname", "localhost");
@@ -460,7 +467,6 @@ public class WeaponMechanics extends MechanicsPlugin {
         weaponConfigurations.clear();
         ammoConfigurations.clear();
         projectileConfigurations.clear();
-        repairKitConfigurations.clear();
         projectileSpawner = null;
     }
 
@@ -490,10 +496,6 @@ public class WeaponMechanics extends MechanicsPlugin {
         return projectileConfigurations;
     }
 
-    public @NotNull Configuration getRepairKitConfigurations() {
-        return repairKitConfigurations;
-    }
-
     public @NotNull Configuration getWeaponConfigurations() {
         return weaponConfigurations;
     }
@@ -508,7 +510,7 @@ public class WeaponMechanics extends MechanicsPlugin {
      * @param entity the entity wrapper to get
      * @return the entity wrapper
      */
-    public @NotNull EntityWrapper getEntityWrapper(LivingEntity entity) {
+    public @NotNull EntityWrapper getEntityWrapper(@NotNull LivingEntity entity) {
         if (entity.getType() == EntityType.PLAYER) {
             return getPlayerWrapper((Player) entity);
         }
@@ -524,7 +526,7 @@ public class WeaponMechanics extends MechanicsPlugin {
      * @param noAutoAdd true means that EntityWrapper wont be automatically added if not found
      * @return the entity wrapper or null if no auto add is true and EntityWrapper was not found
      */
-    public @Nullable EntityWrapper getEntityWrapper(LivingEntity entity, boolean noAutoAdd) {
+    public @Nullable EntityWrapper getEntityWrapper(@NotNull LivingEntity entity, boolean noAutoAdd) {
         if (entity.getType() == EntityType.PLAYER) {
             return getPlayerWrapper((Player) entity);
         }
@@ -546,7 +548,7 @@ public class WeaponMechanics extends MechanicsPlugin {
      * @param player the player wrapper to get
      * @return the player wrapper
      */
-    public PlayerWrapper getPlayerWrapper(Player player) {
+    public @NotNull PlayerWrapper getPlayerWrapper(@NotNull Player player) {
         EntityWrapper wrapper = entityWrappers.get(player);
         if (wrapper == null) {
             wrapper = new PlayerWrapper(player);
@@ -564,7 +566,7 @@ public class WeaponMechanics extends MechanicsPlugin {
      *
      * @param entity the entity (or player)
      */
-    public void removeEntityWrapper(LivingEntity entity) {
+    public void removeEntityWrapper(@NotNull LivingEntity entity) {
         EntityWrapper oldWrapper = entityWrappers.remove(entity);
         if (oldWrapper != null) {
             TaskImplementation<Void> oldMoveTask = oldWrapper.getMoveTask();
