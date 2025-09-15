@@ -27,7 +27,7 @@ hikariCp = "5.1.0"
 jsonSimple = "1.1.1"
 kotlin = "1.9.23"
 spigotUpdateChecker = "3.0.4"
-xSeries = "13.3.1"
+xSeries = "13.4.0"
 
 
 [libraries]
