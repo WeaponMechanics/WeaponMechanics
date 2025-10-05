@@ -32,6 +32,7 @@ public class RecoilController implements Consumer<TaskImplementation<Void>> {
     private float dampingRecovery = 0f;
     private float recoilSpeed = 0f;
 
+
     // Current "accumulated" recoil (the internal model)
     private float currentRecoilX = 0f;
     private float currentRecoilY = 0f;
@@ -45,10 +46,18 @@ public class RecoilController implements Consumer<TaskImplementation<Void>> {
     private float residualBaseRecoilY = 0f;
     private float recoveryPercentage = 1f;  // 1.0 means 100% recovery, 0.0 means no recovery
 
+    // simple thread-safe flag to request a reset from the main thread
+    private volatile boolean resetRequested = false;
+    
     public RecoilController(@NotNull Player player) {
         this.player = player;
     }
 
+    /** Clears all accumulated/target/residual recoil so the next tick starts from 0. */
+    public void hardReset() {
+        resetRequested = true;
+    }
+    
     public void onShotFired(
         @NotNull RecoilProfile recoil,
         @Nullable String weaponTitle,
@@ -59,14 +68,21 @@ public class RecoilController implements Consumer<TaskImplementation<Void>> {
         float dx;
         float dy;
         float maxAccum;
-
+        
+        if (resetRequested) {
+            resetRequested = false;
+            currentRecoilX = currentRecoilY = 0f;
+            targetRecoilX  = targetRecoilY  = 0f;
+            residualBaseRecoilX = residualBaseRecoilY = 0f;
+        }
+        
         if (weaponTitle != null && weaponStack != null && shooter != null) {
             WeaponRecoilEvent event = new WeaponRecoilEvent(weaponTitle, weaponStack, shooter, hand, recoil);
             Bukkit.getPluginManager().callEvent(event);
             if (event.isCancelled()) {
                 return;
             }
-
+            
             damping = event.getDamping();
             smoothingFactor = event.getSmoothingFactor();
             dampingRecovery = event.getDampingRecovery();
@@ -109,7 +125,12 @@ public class RecoilController implements Consumer<TaskImplementation<Void>> {
         if (!player.isOnline() || player.isDead()) {
             return;
         }
-
+        if (resetRequested) {
+            resetRequested = false;
+            currentRecoilX = currentRecoilY = 0f;
+            targetRecoilX  = targetRecoilY  = 0f;
+            residualBaseRecoilX = residualBaseRecoilY = 0f;
+        }
         // Store the old recoil values
         float oldX = currentRecoilX;
         float oldY = currentRecoilY;
