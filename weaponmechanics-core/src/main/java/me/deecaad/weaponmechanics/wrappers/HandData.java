@@ -18,6 +18,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 public class HandData {
 
@@ -317,7 +318,19 @@ public class HandData {
         return currentWeaponTitle;
     }
 
+    /**
+     * Sets the current weapon title tracked for this hand.
+     * When the title actually changes, we hard-reset the player's RecoilController state
+     * so the next shot starts from zero (no carry-over from the previous weapon).
+     */
     public void setCurrentWeaponTitle(String currentWeaponTitle) {
+        // Only react on real changes
+        boolean changed = !Objects.equals(this.currentWeaponTitle, currentWeaponTitle);
+
         this.currentWeaponTitle = currentWeaponTitle;
+
+        if (changed && entityWrapper instanceof PlayerWrapper pw) {
+            pw.getRecoilController().hardReset();
+        }
     }
 }
