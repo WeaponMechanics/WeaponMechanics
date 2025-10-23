@@ -25,7 +25,7 @@ foliaScheduler = "0.7.4-SNAPSHOT"
 gson = "2.13.1"
 hikariCp = "5.1.0"
 jsonSimple = "1.1.1"
-kotlin = "1.9.23"
+kotlin = "2.2.21"
 spigotUpdateChecker = "3.0.4"
 xSeries = "13.3.1"
 
