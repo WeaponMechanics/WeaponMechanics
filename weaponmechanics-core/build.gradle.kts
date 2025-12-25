@@ -9,7 +9,7 @@ plugins {
 
 dependencies {
     // Core Minecraft dependencies
-    compileOnly(libs.spigotApi)
+    compileOnly(libs.paper)
     compileOnly(libs.mechanicsCore)
     compileOnly(libs.packetEvents)
 
@@ -19,10 +19,6 @@ dependencies {
     compileOnly(libs.vivecraft)
 
     // Shaded dependencies
-    compileOnly(libs.adventureApi)
-    compileOnly(libs.adventureBukkit)
-    compileOnly(libs.adventureTextLegacy)
-    compileOnly(libs.adventureTextMinimessage)
     compileOnly(libs.annotations)
     compileOnly(libs.bstats)
     compileOnly(libs.commandApi)
@@ -31,12 +27,11 @@ dependencies {
     compileOnly(libs.foliaScheduler)
     compileOnly(libs.hikariCp)
     compileOnly(libs.jsonSimple)
-    compileOnly(libs.spigotUpdateChecker)
     compileOnly(libs.xSeries)
     compileOnly(kotlin("stdlib"))
 
     // Testing dependencies
-    testImplementation(libs.spigotApi)
+    testImplementation(libs.paper)
     testImplementation(libs.annotations)
     testImplementation(libs.foliaScheduler)
 }

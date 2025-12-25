@@ -87,7 +87,7 @@ public class WeaponMechanics extends MechanicsPlugin {
     private @NotNull Configuration weaponConfigurations = new FastConfiguration();
 
     public WeaponMechanics() {
-        super(null, Style.style(NamedTextColor.GOLD), Style.style(NamedTextColor.GRAY), 14323);
+        super(Style.style(NamedTextColor.GOLD), Style.style(NamedTextColor.GRAY), 14323);
     }
 
     @Override

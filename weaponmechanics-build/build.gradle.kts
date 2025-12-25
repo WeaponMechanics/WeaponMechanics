@@ -41,8 +41,6 @@ tasks.shadowJar {
 
     relocate("org.slf4j", "$libPackage.slf4j")
     relocate("org.bstats", "$libPackage.bstats")
-    relocate("net.kyori", "$libPackage.kyori")
-    relocate("com.jeff_media.updatechecker", "$libPackage.updatechecker")
     relocate("dev.jorel.commandapi", "$libPackage.commandapi")
     relocate("com.cjcrafter.foliascheduler", "$libPackage.scheduler")
     relocate("com.zaxxer.hikari", "$libPackage.hikari")

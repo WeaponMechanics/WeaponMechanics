@@ -15,12 +15,10 @@ dependencyResolutionManagement {
     repositories {
         mavenCentral()
         maven(url = "https://central.sonatype.com/repository/maven-snapshots/") // MechanicsCore Snapshots
-        maven(url = "https://hub.spigotmc.org/nexus/content/repositories/snapshots/") // Spigot API
-        maven(url = "https://s01.oss.sonatype.org/content/repositories/snapshots/") // Adventure Snapshots
+        maven(url = "https://repo.papermc.io/repository/maven-public/") // Paper API
         maven(url = "https://repo.extendedclip.com/content/repositories/placeholderapi/") // PlaceholderAPI
         maven(url = "https://mvn.lumine.io/repository/maven-public/") // MythicMobs
         maven(url = "https://repo.opencollab.dev/main/") // GeyserMC
-        maven(url = "https://repo.jeff-media.com/public/") // SpigotUpdateChecker
         maven(url = "https://repo.codemc.org/repository/maven-public/") // NBTAPI from CommandAPI
         maven(url = "https://repo.codemc.io/repository/maven-releases/") // PacketEvents
     }
