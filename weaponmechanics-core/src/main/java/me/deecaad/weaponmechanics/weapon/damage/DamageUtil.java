@@ -150,7 +150,8 @@ public class DamageUtil {
                 bukkitSource.withCausingEntity(source.getShooter()).withDirectEntity(source.getShooter());
             }
 
-            var entityDamageByEntityEvent = new EntityDamageByEntityEvent(source.getShooter(), victim, cause, bukkitSource.build(), Collections.emptyMap(), Collections.emptyMap(), false);
+
+            var entityDamageByEntityEvent = new EntityDamageByEntityEvent(source.getShooter(), victim, cause, bukkitSource.build(), Collections.singletonMap(EntityDamageEvent.DamageModifier.BASE, damage), Collections.singletonMap(EntityDamageEvent.DamageModifier.BASE, it -> it), false);
             victim.setMetadata("doing-weapon-damage", new LazyMetadataValue(WeaponMechanics.getInstance(), () -> true));
             Bukkit.getPluginManager().callEvent(entityDamageByEntityEvent);
             victim.removeMetadata("doing-weapon-damage", WeaponMechanics.getInstance());

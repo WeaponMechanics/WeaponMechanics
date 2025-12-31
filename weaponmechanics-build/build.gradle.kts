@@ -10,7 +10,7 @@ dependencies {
 
     // Platform modules
     file("../weaponmechanics-platforms/paper").listFiles()?.forEach {
-        implementation(project(":${it.name}", "reobf"))
+        implementation(project(":${it.name}"))
     }
 }
 
@@ -21,7 +21,7 @@ bukkitPluginYaml {
     main = "me.deecaad.weaponmechanics.WeaponMechanics"
     name = "WeaponMechanics"
     version = versionProperty
-    apiVersion = "1.13"  // Use 1.13, since apiVersion was added in 1.13
+    apiVersion = "1.21"
     foliaSupported = true
 
     authors = listOf("DeeCaaD", "CJCrafter")

@@ -16,13 +16,13 @@ import dev.jorel.commandapi.kotlindsl.doubleArgument
 import dev.jorel.commandapi.kotlindsl.entityExecutor
 import dev.jorel.commandapi.kotlindsl.entitySelectorArgumentManyEntities
 import dev.jorel.commandapi.kotlindsl.entitySelectorArgumentManyPlayers
+import dev.jorel.commandapi.kotlindsl.entitySelectorArgumentOnePlayer
 import dev.jorel.commandapi.kotlindsl.entityTypeArgument
 import dev.jorel.commandapi.kotlindsl.floatArgument
 import dev.jorel.commandapi.kotlindsl.greedyStringArgument
 import dev.jorel.commandapi.kotlindsl.integerArgument
 import dev.jorel.commandapi.kotlindsl.locationArgument
 import dev.jorel.commandapi.kotlindsl.multiLiteralArgument
-import dev.jorel.commandapi.kotlindsl.playerArgument
 import dev.jorel.commandapi.kotlindsl.playerExecutor
 import dev.jorel.commandapi.kotlindsl.stringArgument
 import dev.jorel.commandapi.kotlindsl.subcommand
@@ -206,7 +206,7 @@ object WeaponMechanicsCommand {
                 withPermission("weaponmechanics.commands.giveammo")
                 withShortDescription("Gives ammo of a certain type to a player")
 
-                playerArgument("player")
+                entitySelectorArgumentOnePlayer("player")
                 stringArgument("ammo")
                 booleanArgument("magazine", optional = true)
                 integerArgument("amount", 1, 64, optional = true)
@@ -534,7 +534,7 @@ object WeaponMechanicsCommand {
                     withShortDescription("Shows the stats of a player or weapon")
 
                     multiLiteralArgument(nodeName = "type", "player", "weapon")
-                    playerArgument("target")
+                    entitySelectorArgumentOnePlayer("target")
                     stringArgument("weapon", optional = true) {
                         replaceSuggestions(
                             ArgumentSuggestions.strings {
