@@ -1,7 +1,9 @@
+import xyz.jpenilla.resourcefactory.paper.PaperPluginYaml
+
 plugins {
     `java-library`
     id("com.gradleup.shadow") version "8.3.5"
-    id("xyz.jpenilla.resource-factory-bukkit-convention") version "1.3.0"
+    id("xyz.jpenilla.resource-factory-paper-convention") version "1.3.1"
 }
 
 dependencies {
@@ -14,7 +16,7 @@ dependencies {
     }
 }
 
-bukkitPluginYaml {
+paperPluginYaml {
     val versionProperty = findProperty("version") as? String
         ?: throw IllegalArgumentException("version was null")
 
@@ -25,8 +27,16 @@ bukkitPluginYaml {
     foliaSupported = true
 
     authors = listOf("DeeCaaD", "CJCrafter")
-    depend = listOf("MechanicsCore", "packetevents")
-    softDepend = listOf("WorldEdit", "WorldGuard", "PlaceholderAPI", "MythicMobs", "Geyser-Spigot")
+    dependencies {
+        // Server dependencies - controls load order during plugin initialization
+        server("packetevents", required = true, load = PaperPluginYaml.Load.BEFORE)
+        server("MechanicsCore", required = true, load = PaperPluginYaml.Load.BEFORE)
+        server("WorldEdit", required = false)
+        server("WorldGuard", required = false)
+        server("PlaceholderAPI", required = false)
+        server("MythicMobs", required = false)
+        server("Geyser-Spigot", required = false)
+    }
 }
 
 tasks.shadowJar {
