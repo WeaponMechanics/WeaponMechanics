@@ -17,10 +17,7 @@ import me.deecaad.core.utils.StringUtil;
 import me.deecaad.weaponmechanics.WeaponMechanics;
 import me.deecaad.weaponmechanics.wrappers.MessageHelper;
 import me.deecaad.weaponmechanics.wrappers.PlayerWrapper;
-import net.kyori.adventure.Adventure;
-import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.bossbar.BossBar;
-import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.TextComponent;
@@ -86,7 +83,6 @@ public class WeaponInfoDisplay implements Serializer<WeaponInfoDisplay> {
 
     public void send(PlayerWrapper playerWrapper, EquipmentSlot slot, ItemStack knownNewMainStack, ItemStack knownNewOffStack) {
         Configuration config = WeaponMechanics.getInstance().getWeaponConfigurations();
-        BukkitAudiences adventure = WeaponMechanics.getInstance().getAdventure();
         Player player = playerWrapper.getPlayer();
         MessageHelper messageHelper = playerWrapper.getMessageHelper();
 
@@ -147,17 +143,14 @@ public class WeaponInfoDisplay implements Serializer<WeaponInfoDisplay> {
                 ComponentLike offHand = getDualDisplay(offDisplay, PlaceholderData.of(player, offStack, offWeapon, EquipmentSlot.OFF_HAND), mainDisplay, false, hasInvertedMainHand);
                 ComponentLike mainHand = getDualDisplay(mainDisplay, PlaceholderData.of(player, mainStack, mainWeapon, EquipmentSlot.HAND), offDisplay, false, hasInvertedMainHand);
 
-                Audience audience = adventure.player(player);
-                audience.sendActionBar(buildDisplay(Component.text(), hasInvertedMainHand, mainHand, offHand));
+                player.sendActionBar(buildDisplay(Component.text(), hasInvertedMainHand, mainHand, offHand));
             } else {
                 if (mainhand) {
                     if (mainStack != null && mainStack.hasItemMeta()) {
-                        Audience audience = adventure.player(player);
-                        audience.sendActionBar(actionBar.replaceAndDeserialize(PlaceholderData.of(player, mainStack, mainWeapon, slot)));
+                        player.sendActionBar(actionBar.replaceAndDeserialize(PlaceholderData.of(player, mainStack, mainWeapon, slot)));
                     }
                 } else if (offStack != null && offStack.hasItemMeta()) {
-                    Audience audience = adventure.player(player);
-                    audience.sendActionBar(actionBar.replaceAndDeserialize(PlaceholderData.of(player, offStack, offWeapon, slot)));
+                    player.sendActionBar(actionBar.replaceAndDeserialize(PlaceholderData.of(player, offStack, offWeapon, slot)));
                 }
             }
         }
@@ -201,8 +194,7 @@ public class WeaponInfoDisplay implements Serializer<WeaponInfoDisplay> {
                 bossBar = BossBar.bossBar(builder, 1.0f, barColor, barStyle);
                 messageHelper.setBossBar(bossBar);
 
-                Audience audience = adventure.player(player);
-                audience.showBossBar(bossBar);
+                player.showBossBar(bossBar);
 
             } else {
                 messageHelper.getBossBarTask().cancel();
@@ -215,8 +207,7 @@ public class WeaponInfoDisplay implements Serializer<WeaponInfoDisplay> {
                 bossBar.progress((float) magazineProgress);
             }
             messageHelper.setBossBarTask(WeaponMechanics.getInstance().getFoliaScheduler().entity(player).runDelayed(() -> {
-                Audience audience = adventure.player(player);
-                audience.hideBossBar(messageHelper.getBossBar());
+                player.hideBossBar(messageHelper.getBossBar());
                 messageHelper.setBossBar(null);
                 messageHelper.setBossBarTask(null);
             }, 40));

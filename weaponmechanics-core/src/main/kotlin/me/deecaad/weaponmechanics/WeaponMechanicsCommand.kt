@@ -16,13 +16,13 @@ import dev.jorel.commandapi.kotlindsl.doubleArgument
 import dev.jorel.commandapi.kotlindsl.entityExecutor
 import dev.jorel.commandapi.kotlindsl.entitySelectorArgumentManyEntities
 import dev.jorel.commandapi.kotlindsl.entitySelectorArgumentManyPlayers
+import dev.jorel.commandapi.kotlindsl.entitySelectorArgumentOnePlayer
 import dev.jorel.commandapi.kotlindsl.entityTypeArgument
 import dev.jorel.commandapi.kotlindsl.floatArgument
 import dev.jorel.commandapi.kotlindsl.greedyStringArgument
 import dev.jorel.commandapi.kotlindsl.integerArgument
 import dev.jorel.commandapi.kotlindsl.locationArgument
 import dev.jorel.commandapi.kotlindsl.multiLiteralArgument
-import dev.jorel.commandapi.kotlindsl.playerArgument
 import dev.jorel.commandapi.kotlindsl.playerExecutor
 import dev.jorel.commandapi.kotlindsl.stringArgument
 import dev.jorel.commandapi.kotlindsl.subcommand
@@ -47,6 +47,7 @@ import me.deecaad.core.utils.NumberUtil.approximately
 import me.deecaad.core.utils.NumberUtil.toTime
 import me.deecaad.core.utils.Quaternion
 import me.deecaad.core.utils.RandomUtil.element
+import me.deecaad.core.utils.RegistryUtil
 import me.deecaad.core.utils.StringUtil.colorBukkit
 import me.deecaad.core.utils.TableBuilder
 import me.deecaad.core.utils.Transform
@@ -205,7 +206,7 @@ object WeaponMechanicsCommand {
                 withPermission("weaponmechanics.commands.giveammo")
                 withShortDescription("Gives ammo of a certain type to a player")
 
-                playerArgument("player")
+                entitySelectorArgumentOnePlayer("player")
                 stringArgument("ammo")
                 booleanArgument("magazine", optional = true)
                 integerArgument("amount", 1, 64, optional = true)
@@ -533,7 +534,7 @@ object WeaponMechanicsCommand {
                     withShortDescription("Shows the stats of a player or weapon")
 
                     multiLiteralArgument(nodeName = "type", "player", "weapon")
-                    playerArgument("target")
+                    entitySelectorArgumentOnePlayer("target")
                     stringArgument("weapon", optional = true) {
                         replaceSuggestions(
                             ArgumentSuggestions.strings {
@@ -718,7 +719,7 @@ object WeaponMechanicsCommand {
                 .append(text(" ", style))
                 .append(text().content(weaponInfo).style(style))
 
-        WeaponMechanics.getInstance().adventure.sender(sender).sendMessage(builder)
+        sender.sendMessage(builder)
     }
 
     fun giveAmmo(
@@ -779,8 +780,7 @@ object WeaponMechanicsCommand {
     }
 
     fun info(sender: CommandSender) {
-        val weaponMechanics = WeaponMechanics.getInstance();
-        val audience = weaponMechanics.adventure.sender(sender)
+        val weaponMechanics = WeaponMechanics.getInstance()
 
         val desc = weaponMechanics.description
         val mechanicsCoreVersion = MechanicsCore.getInstance().description.version
@@ -850,7 +850,7 @@ object WeaponMechanicsCommand {
                 )
                 .build()
 
-        audience.sendMessage(bigComponent)
+        sender.sendMessage(bigComponent)
     }
 
     fun list(
@@ -903,7 +903,7 @@ object WeaponMechanicsCommand {
                 }
                 .build()
 
-        WeaponMechanics.getInstance().adventure.sender(sender!!).sendMessage(table)
+        sender!!.sendMessage(table)
     }
 
     fun wiki(sender: CommandSender?) {
@@ -934,7 +934,7 @@ object WeaponMechanicsCommand {
                 }
                 .build()
 
-        WeaponMechanics.getInstance().adventure.sender(sender!!).sendMessage(table)
+        sender!!.sendMessage(table)
     }
 
     fun nbt(
@@ -998,7 +998,7 @@ object WeaponMechanicsCommand {
                         }
                     }
 
-                val exposure = ExplosionExposures.REGISTRY.match(exposureString) as ExplosionExposure
+                val exposure = RegistryUtil.matchAny(ExplosionExposures.REGISTRY, exposureString)
                 val explosion =
                     Explosion(
                         shape, exposure, blockDamage, regeneration, null, 0.0, 1.0,
@@ -1253,8 +1253,8 @@ object WeaponMechanicsCommand {
         location: Location?,
         time: Int,
         type: FireworkEffect.Type?,
-        color: Color?,
-        fade: Color?,
+        color: Color,
+        fade: Color,
         flicker: Boolean,
         trail: Boolean,
     ) {
@@ -1369,7 +1369,7 @@ object WeaponMechanicsCommand {
                     var ticks: Int = 0
 
                     override fun accept(task: TaskImplementation<Void>) {
-                        WeaponMechanics.getInstance().adventure.player(player).sendActionBar(text("Recoil: $ticks"))
+                        player.sendActionBar(text("Recoil: $ticks"))
                         controller.onShotFired(recoil, null, null, null, null)
 
                         ticks += rate

@@ -1,12 +1,12 @@
 [versions]
 # Core Minecraft dependencies
 brigadier = "1.3.10"
-spigotApi = "1.21.4-R0.1-SNAPSHOT"
+paper = "1.21.11-R0.1-SNAPSHOT"
 packetEvents = "2.8.0"
 
 # External "hooks" or plugins that we might interact with
 geyser = "2.7.2-SNAPSHOT"
-mechanicsCore = "4.1.5-SNAPSHOT"
+mechanicsCore = "4.2.0-SNAPSHOT"
 mythicMobs = "5.9.0"
 placeholderApi = "2.11.6"
 vault = "1.7.1"
@@ -15,25 +15,22 @@ worldedit = "7.3.14"
 worldguard = "7.0.14"
 
 # Shaded dependencies
-adventureApi = "4.24.0"
-adventureBukkit = "4.4.1"
 annotations = "26.0.2"
 bstats = "3.1.0"
-commandApi = "10.1.2"
+commandApi = "11.1.0"
 fastUtil = "8.5.15"
-foliaScheduler = "0.7.4-SNAPSHOT"
+foliaScheduler = "0.7.5"
 gson = "2.13.1"
 hikariCp = "5.1.0"
 jsonSimple = "1.1.1"
 kotlin = "1.9.23"
-spigotUpdateChecker = "3.0.4"
-xSeries = "13.3.1"
+xSeries = "13.6.0"
 
 
 [libraries]
 # Core Minecraft dependencies
 brigadier      = { module = "com.mojang:brigadier", version.ref = "brigadier" }
-spigotApi      = { module = "org.spigotmc:spigot-api", version.ref = "spigotApi" }
+paper          = { module = "io.papermc.paper:paper-api", version.ref = "paper" }
 packetEvents   = { module = "com.github.retrooper:packetevents-spigot", version.ref = "packetEvents" }
 
 # External "hooks" or plugins that we might interact with
@@ -47,20 +44,15 @@ worldedit      = { module = "com.sk89q.worldedit:worldedit-bukkit", version.ref 
 worldguard     = { module = "com.sk89q.worldguard:worldguard-bukkit", version.ref = "worldguard" }
 
 # Shaded dependencies
-adventureApi             = { module = "net.kyori:adventure-api", version.ref = "adventureApi" }
-adventureBukkit          = { module = "net.kyori:adventure-platform-bukkit", version.ref = "adventureBukkit" }
-adventureTextLegacy      = { module = "net.kyori:adventure-text-serializer-legacy", version.ref = "adventureApi" }
-adventureTextMinimessage = { module = "net.kyori:adventure-text-minimessage", version.ref = "adventureApi" }
 annotations              = { module = "org.jetbrains:annotations", version.ref = "annotations" }
 bstats                   = { module = "org.bstats:bstats-bukkit", version.ref = "bstats" }
-commandApi               = { module = "dev.jorel:commandapi-bukkit-core", version.ref = "commandApi" }
-commandApiShade          = { module = "dev.jorel:commandapi-bukkit-shade", version.ref = "commandApi" }
-commandApiKotlin         = { module = "dev.jorel:commandapi-bukkit-kotlin", version.ref = "commandApi" }
+commandApi               = { module = "dev.jorel:commandapi-paper-core", version.ref = "commandApi" }
+commandApiShade          = { module = "dev.jorel:commandapi-paper-shade", version.ref = "commandApi" }
+commandApiKotlin         = { module = "dev.jorel:commandapi-kotlin-paper", version.ref = "commandApi" }
 fastUtil                 = { module = "it.unimi.dsi:fastutil", version.ref = "fastUtil" }
 foliaScheduler           = { module = "com.cjcrafter:foliascheduler", version.ref = "foliaScheduler" }
 gson                     = { module = "com.google.code.gson:gson", version.ref = "gson" }
 hikariCp                 = { module = "com.zaxxer:HikariCP", version.ref = "hikariCp" }
 jsonSimple               = { module = "com.googlecode.json-simple:json-simple", version.ref = "jsonSimple" }
 kotlinStdlib             = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
-spigotUpdateChecker      = { module = "com.jeff_media:SpigotUpdateChecker", version.ref = "spigotUpdateChecker" }
 xSeries                  = { module = "com.github.cryptomorin:XSeries", version.ref = "xSeries" }

@@ -10,7 +10,7 @@ dependencies {
 
     // Platform modules
     file("../weaponmechanics-platforms/paper").listFiles()?.forEach {
-        implementation(project(":${it.name}", "reobf"))
+        implementation(project(":${it.name}"))
     }
 }
 
@@ -21,7 +21,7 @@ bukkitPluginYaml {
     main = "me.deecaad.weaponmechanics.WeaponMechanics"
     name = "WeaponMechanics"
     version = versionProperty
-    apiVersion = "1.13"  // Use 1.13, since apiVersion was added in 1.13
+    apiVersion = "1.21"
     foliaSupported = true
 
     authors = listOf("DeeCaaD", "CJCrafter")
@@ -41,8 +41,6 @@ tasks.shadowJar {
 
     relocate("org.slf4j", "$libPackage.slf4j")
     relocate("org.bstats", "$libPackage.bstats")
-    relocate("net.kyori", "$libPackage.kyori")
-    relocate("com.jeff_media.updatechecker", "$libPackage.updatechecker")
     relocate("dev.jorel.commandapi", "$libPackage.commandapi")
     relocate("com.cjcrafter.foliascheduler", "$libPackage.scheduler")
     relocate("com.zaxxer.hikari", "$libPackage.hikari")

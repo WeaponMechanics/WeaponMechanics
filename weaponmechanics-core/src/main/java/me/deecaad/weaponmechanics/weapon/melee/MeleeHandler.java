@@ -107,7 +107,7 @@ public class MeleeHandler implements IValidator {
                 String permissionMessage = WeaponMechanics.getInstance().getConfiguration().getString("Messages.Permissions.Use_Weapon", "<red>You do not have permission to use " + weaponTitle);
                 PlaceholderMessage message = new PlaceholderMessage(StringUtil.colorAdventure(permissionMessage));
                 Component component = message.replaceAndDeserialize(PlaceholderData.of(player, weaponStack, weaponTitle, slot));
-                WeaponMechanics.getInstance().getAdventure().player(player).sendMessage(component);
+                player.sendMessage(component);
             }
             return false;
         }

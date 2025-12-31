@@ -13,5 +13,5 @@ dependencies {
     compileOnly(libs.mechanicsCore)
     compileOnly(libs.foliaScheduler)
 
-    paperweight.paperDevBundle("1.21.3-R0.1-SNAPSHOT")
+    paperweight.paperDevBundle("1.21.10-R0.1-SNAPSHOT")
 }

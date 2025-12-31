@@ -36,6 +36,7 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collections;
 import java.util.Set;
 
 public class DamageUtil {
@@ -149,7 +150,8 @@ public class DamageUtil {
                 bukkitSource.withCausingEntity(source.getShooter()).withDirectEntity(source.getShooter());
             }
 
-            var entityDamageByEntityEvent = new EntityDamageByEntityEvent(source.getShooter(), victim, cause, bukkitSource.build(), damage);
+
+            var entityDamageByEntityEvent = new EntityDamageByEntityEvent(source.getShooter(), victim, cause, bukkitSource.build(), Collections.singletonMap(EntityDamageEvent.DamageModifier.BASE, damage), Collections.singletonMap(EntityDamageEvent.DamageModifier.BASE, it -> it), false);
             victim.setMetadata("doing-weapon-damage", new LazyMetadataValue(WeaponMechanics.getInstance(), () -> true));
             Bukkit.getPluginManager().callEvent(entityDamageByEntityEvent);
             victim.removeMetadata("doing-weapon-damage", WeaponMechanics.getInstance());
@@ -157,7 +159,8 @@ public class DamageUtil {
                 return true;
 
             // Plugins may modify the event... So let's update our variables
-            damage = entityDamageByEntityEvent.getDamage();
+            // no longer using this since we do not even pass damage... just check if the damage is cancelled.
+            // damage = entityDamageByEntityEvent.getDamage();
         }
 
         // If a plugin modified the damage, and set it to 0.0, just cancel
@@ -392,7 +395,7 @@ public class DamageUtil {
         entity.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 900, 1));
         entity.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, 100, 1));
         entity.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 800, 0));
-        entity.playEffect(EntityEffect.TOTEM_RESURRECT);
+        entity.playEffect(EntityEffect.PROTECTED_FROM_DEATH);
         return true;
     }
 }

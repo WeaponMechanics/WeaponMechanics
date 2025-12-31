@@ -109,11 +109,11 @@ public class ScopeHandler implements IValidator, TriggerListener {
 
                 // Handle permissions
                 if (!hasPermission) {
-                    if (shooter.getType() == EntityType.PLAYER) {
+                    if (shooter instanceof Player player) {
                         PlaceholderMessage permissionMessage = new PlaceholderMessage(WeaponMechanics.getInstance().getConfiguration().getString("Messages.Permissions.Use_Weapon", ChatColor.RED
                             + "You do not have permission to use " + weaponTitle));
-                        Component component = permissionMessage.replaceAndDeserialize(PlaceholderData.of((Player) shooter, weaponStack, weaponTitle, slot));
-                        WeaponMechanics.getInstance().getAdventure().sender(shooter).sendMessage(component);
+                        Component component = permissionMessage.replaceAndDeserialize(PlaceholderData.of(player, weaponStack, weaponTitle, slot));
+                        player.sendMessage(component);
                     }
                     return false;
                 }
@@ -140,11 +140,11 @@ public class ScopeHandler implements IValidator, TriggerListener {
 
             // Handle permissions
             if (!hasPermission) {
-                if (shooter.getType() == EntityType.PLAYER) {
+                if (shooter instanceof Player player) {
                     PlaceholderMessage permissionMessage = new PlaceholderMessage(WeaponMechanics.getInstance().getConfiguration().getString("Messages.Permissions.Use_Weapon", ChatColor.RED
                         + "You do not have permission to use " + weaponTitle));
-                    Component component = permissionMessage.replaceAndDeserialize(PlaceholderData.of((Player) shooter, weaponStack, weaponTitle, slot));
-                    WeaponMechanics.getInstance().getAdventure().sender(shooter).sendMessage(component);
+                    Component component = permissionMessage.replaceAndDeserialize(PlaceholderData.of(player, weaponStack, weaponTitle, slot));
+                    player.sendMessage(component);
                 }
                 return false;
             }

@@ -30,10 +30,10 @@ import me.deecaad.weaponmechanics.weapon.weaponevents.ProjectileExplodeEvent;
 import me.deecaad.weaponmechanics.weapon.weaponevents.ProjectilePreExplodeEvent;
 import me.deecaad.weaponmechanics.wrappers.EntityWrapper;
 import me.deecaad.weaponmechanics.wrappers.PlayerWrapper;
-import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.ChatColor;
 import org.bukkit.ExplosionResult;
 import org.bukkit.Location;
@@ -207,10 +207,9 @@ public class Explosion implements Serializer<Explosion> {
         PlayerWrapper playerWrapper = cause.getType() == EntityType.PLAYER ? (PlayerWrapper) entityWrapper : null;
         if (!worldGuard.testFlag(origin, playerWrapper != null ? playerWrapper.getPlayer() : null, "weapon-explode")) {
             Object obj = worldGuard.getValue(origin, "weapon-explode-message");
-            if (obj != null && !obj.toString().isEmpty()) {
+            if (obj != null && !obj.toString().isEmpty() && entityWrapper.getEntity() instanceof Player player) {
                 Component component = MiniMessage.miniMessage().deserialize(obj.toString());
-                Audience audience = WeaponMechanics.getInstance().getAdventure().sender(entityWrapper.getEntity());
-                audience.sendMessage(component);
+                player.sendMessage(component);
             }
             return;
         }
