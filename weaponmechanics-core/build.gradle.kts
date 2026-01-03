@@ -16,7 +16,7 @@ dependencies {
     // External "hooks" or plugins that we might interact with
     compileOnly(libs.placeholderApi)
     compileOnly(libs.mythicMobs)
-    compileOnly(libs.vivecraft)
+    compileOnly(files("../libs/Vivecraft-Spigot-Extension-1.3.4-0.jar"))
 
     // Shaded dependencies
     compileOnly(libs.annotations)

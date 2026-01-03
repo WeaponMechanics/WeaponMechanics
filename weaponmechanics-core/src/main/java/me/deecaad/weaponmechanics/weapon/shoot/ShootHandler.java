@@ -15,6 +15,7 @@ import me.deecaad.core.utils.NumberUtil;
 import me.deecaad.core.utils.StringUtil;
 import me.deecaad.weaponmechanics.WeaponMechanics;
 import me.deecaad.weaponmechanics.utils.CustomTag;
+import me.deecaad.weaponmechanics.weapon.HapticSerializer;
 import me.deecaad.weaponmechanics.weapon.WeaponHandler;
 import me.deecaad.weaponmechanics.weapon.firearm.FirearmAction;
 import me.deecaad.weaponmechanics.weapon.firearm.FirearmState;
@@ -570,6 +571,11 @@ public class ShootHandler implements IValidator, TriggerListener {
             WeaponMechanics.getInstance().debugger.severe(weaponTitle + ".Shoot.Projectiles_Per_Shot should be at least 1, got " + prepareEvent.getProjectileAmount());
         }
 
+        HapticSerializer haptic = config.getObject(weaponTitle + ".Shoot.Haptic", HapticSerializer.class);
+        if (haptic != null) {
+            haptic.sendHapticPulse(weaponTitle, weaponStack, livingEntity, slot);
+        }
+
         // Consumables can have no projectile, so only try to fire bullets if there is a projectile
         if (prepareEvent.getProjectile() != null) {
             for (int i = 0; i < prepareEvent.getProjectileAmount(); i++) {
@@ -799,6 +805,8 @@ public class ShootHandler implements IValidator, TriggerListener {
         }
 
         configuration.set(data.getKey() + ".Reset_Fall_Distance", data.of("Reset_Fall_Distance").getBool().orElse(false));
+
+        configuration.set(data.getKey() + ".Haptic", data.of("Haptic").serialize(HapticSerializer.class).orElse(null));
     }
 
     private boolean isInvalidFullAuto(TriggerType triggerType) {

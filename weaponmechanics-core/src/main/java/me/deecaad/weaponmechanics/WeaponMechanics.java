@@ -148,13 +148,6 @@ public class WeaponMechanics extends MechanicsPlugin {
             debugger.info("Buy WeaponMechanicsCosmetics to support our development: https://pluginify.org/resources/13/");
         if (Bukkit.getPluginManager().getPlugin("WeaponMechanicsPlus") == null)
             debugger.info("Buy WeaponMechanicsPlus to support our development: https://pluginify.org/resources/14/");
-
-        // Detect Vivecraft-Spigot-Extensions and suggest switching to VivecraftSpigot
-        if (Bukkit.getPluginManager().getPlugin("Vivecraft_Spigot_Extensions") != null) {
-            debugger.warning("Detected 'Vivecraft_Spigot_Extensions' on your server");
-            debugger.warning("For better compatibility with WeaponMechanics, we recommend switching to VivecraftSpigot");
-            debugger.warning("VivecraftSpigot: https://www.spigotmc.org/resources/104539/");
-        }
     }
 
     @Override

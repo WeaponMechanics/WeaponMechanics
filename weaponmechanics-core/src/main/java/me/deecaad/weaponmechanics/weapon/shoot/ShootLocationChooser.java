@@ -1,7 +1,5 @@
 package me.deecaad.weaponmechanics.weapon.shoot;
 
-import com.cjcrafter.vivecraft.VSE;
-import com.cjcrafter.vivecraft.VivePlayer;
 import me.deecaad.core.file.SerializeData;
 import me.deecaad.core.file.Serializer;
 import me.deecaad.core.file.SerializerException;
@@ -15,10 +13,14 @@ import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.MainHand;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.vivecraft.api.VRAPI;
+import org.vivecraft.api.data.VRBodyPartData;
+import org.vivecraft.api.data.VRPose;
 
 import java.util.List;
 
@@ -68,12 +70,12 @@ public class ShootLocationChooser implements Serializer<ShootLocationChooser> {
         Location source = null;
 
         // Check if this entity is a Vivecraft player
-        if (shooter.getType() == EntityType.PLAYER && Bukkit.getPluginManager().getPlugin("VivecraftSpigot") != null) {
-            VivePlayer vivePlayer = VSE.vivePlayers.get(shooter.getUniqueId());
-            if (vivePlayer != null && vivePlayer.isVR()) {
-
-                source = vivePlayer.getControllerPos(isMainHand ? 0 : 1);
-                Vector forward = vivePlayer.getControllerDir(isMainHand ? 0 : 1);
+        if (shooter instanceof Player player && Bukkit.getPluginManager().getPlugin("Vivecraft_Spigot_Extensions") != null) {
+            VRPose pose = VRAPI.instance().getVRPose(player);
+            if (pose != null) {
+                VRBodyPartData controller = isMainHand ? pose.getMainHand() : pose.getOffHand();
+                source = controller.getPos().toLocation(player.getWorld());
+                Vector forward = controller.getDir();
                 source.setDirection(forward);
 
                 if (vr != null) {
@@ -134,11 +136,12 @@ public class ShootLocationChooser implements Serializer<ShootLocationChooser> {
      * @return The controller position, or <code>null</code>
      */
     public static @Nullable Location getControllerPos(@NotNull LivingEntity entity, boolean isMainHand) {
-        if (entity.getType() == EntityType.PLAYER && Bukkit.getPluginManager().getPlugin("VivecraftSpigot") != null) {
-            VivePlayer vivePlayer = VSE.vivePlayers.get(entity.getUniqueId());
-            if (vivePlayer != null && vivePlayer.isVR()) {
-                Location location = vivePlayer.getControllerPos(isMainHand ? 0 : 1);
-                location.setDirection(vivePlayer.getControllerDir(isMainHand ? 0 : 1));
+        if (entity instanceof Player player && Bukkit.getPluginManager().getPlugin("Vivecraft_Spigot_Extensions") != null) {
+            VRPose pose = VRAPI.instance().getVRPose(player);
+            if (pose != null) {
+                VRBodyPartData controller = isMainHand ? pose.getMainHand() : pose.getOffHand();
+                Location location = controller.getPos().toLocation(player.getWorld());
+                location.setDirection(controller.getDir());
                 return location;
             }
         }

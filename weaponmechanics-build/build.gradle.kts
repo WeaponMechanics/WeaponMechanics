@@ -36,6 +36,7 @@ paperPluginYaml {
         server("PlaceholderAPI", required = false)
         server("MythicMobs", required = false)
         server("Geyser-Spigot", required = false)
+        server("Vivecraft-Spigot-Extension", required = false)
     }
 }
 
