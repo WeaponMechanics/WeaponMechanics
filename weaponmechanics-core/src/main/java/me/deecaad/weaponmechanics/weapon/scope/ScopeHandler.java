@@ -1,20 +1,16 @@
 package me.deecaad.weaponmechanics.weapon.scope;
 
-import com.cjcrafter.vivecraft.VSE;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.protocol.potion.PotionTypes;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityEffect;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerAbilities;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerRemoveEntityEffect;
-import me.deecaad.core.MechanicsCore;
 import me.deecaad.core.file.*;
 import me.deecaad.core.file.simple.DoubleSerializer;
 import me.deecaad.core.mechanics.CastData;
 import me.deecaad.core.mechanics.MechanicManager;
-import me.deecaad.core.mechanics.Mechanics;
 import me.deecaad.core.placeholder.PlaceholderData;
 import me.deecaad.core.placeholder.PlaceholderMessage;
-import me.deecaad.core.utils.LogLevel;
 import me.deecaad.core.utils.NumberUtil;
 import me.deecaad.weaponmechanics.WeaponMechanics;
 import me.deecaad.weaponmechanics.weapon.WeaponHandler;
@@ -37,6 +33,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.Nullable;
+import org.vivecraft.api.VRAPI;
 
 import java.util.Collections;
 import java.util.List;
@@ -66,8 +63,8 @@ public class ScopeHandler implements IValidator, TriggerListener {
     public boolean tryUse(EntityWrapper entityWrapper, String weaponTitle, ItemStack weaponStack, EquipmentSlot slot, TriggerType triggerType, boolean dualWield, @Nullable LivingEntity victim) {
         Configuration config = WeaponMechanics.getInstance().getWeaponConfigurations();
 
-        if (Bukkit.getPluginManager().getPlugin("VivecraftSpigot") != null
-            && entityWrapper.isPlayer() && VSE.isVive((Player) entityWrapper.getEntity())) {
+        if (Bukkit.getPluginManager().getPlugin("Vivecraft_Spigot_Extensions") != null
+            && entityWrapper.isPlayer() && VRAPI.instance().isVRPlayer((Player) entityWrapper.getEntity())) {
             // Don't try to use scope this way when player is in VR
             return false;
         }

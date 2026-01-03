@@ -1,16 +1,17 @@
 package me.deecaad.weaponmechanics.wrappers;
 
-import com.cjcrafter.vivecraft.VSE;
-import com.cjcrafter.vivecraft.VivePlayer;
 import me.deecaad.core.mechanics.CastData;
 import me.deecaad.core.mechanics.MechanicManager;
-import me.deecaad.core.mechanics.Mechanics;
 import me.deecaad.weaponmechanics.WeaponMechanics;
 import me.deecaad.weaponmechanics.weapon.scope.ScopeHandler;
 import me.deecaad.weaponmechanics.weapon.weaponevents.WeaponScopeEvent;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.vivecraft.api.VRAPI;
+import org.vivecraft.api.data.VRBodyPartData;
+import org.vivecraft.api.data.VRPose;
 
 public class ZoomData {
 
@@ -34,14 +35,15 @@ public class ZoomData {
      */
     public boolean isZooming() {
         EntityWrapper entityWrapper = handData.getEntityWrapper();
-        if (Bukkit.getPluginManager().getPlugin("VivecraftSpigot") != null && entityWrapper.isPlayer()) {
-
-            VivePlayer vive = VSE.vivePlayers.get(entityWrapper.getEntity().getUniqueId());
-            if (vive != null && vive.isVR()) {
-                // Now we know it's actually VR player
-
-                // Get the position and direction from player metadata
-                return vive.getControllerDir(handData.isMainhand() ? 0 : 1).dot(vive.getHMDDir()) > 0.94;
+        if (Bukkit.getPluginManager().getPlugin("Vivecraft_Spigot_Extensions") != null) {
+            if (entityWrapper.getEntity() instanceof Player player) {
+                VRPose pose = VRAPI.instance().getVRPose(player);
+                if (pose != null) {
+                    // Get the position and direction from player metadata
+                    VRBodyPartData controller = handData.isMainhand() ? pose.getMainHand() : pose.getOffHand();
+                    VRBodyPartData head = pose.getHead();
+                    return controller.getDir().dot(head.getDir()) > 0.94;
+                }
             }
         }
         return zoomAmount != 0;
