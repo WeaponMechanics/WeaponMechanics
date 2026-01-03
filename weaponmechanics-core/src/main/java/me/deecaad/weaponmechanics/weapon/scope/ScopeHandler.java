@@ -13,6 +13,7 @@ import me.deecaad.core.placeholder.PlaceholderData;
 import me.deecaad.core.placeholder.PlaceholderMessage;
 import me.deecaad.core.utils.NumberUtil;
 import me.deecaad.weaponmechanics.WeaponMechanics;
+import me.deecaad.weaponmechanics.weapon.HapticSerializer;
 import me.deecaad.weaponmechanics.weapon.WeaponHandler;
 import me.deecaad.weaponmechanics.weapon.trigger.Trigger;
 import me.deecaad.weaponmechanics.weapon.trigger.TriggerListener;
@@ -372,9 +373,5 @@ public class ScopeHandler implements IValidator, TriggerListener {
             // Convert to millis
             configuration.set(data.getKey() + ".Shoot_Delay_After_Scope", shootDelayAfterScope * 50);
         }
-
-        // Convert from percentage to decimal
-        double scopeMovementSpeed = data.of("Movement_Speed").assertRange(0.0, null).getDouble().orElse(1.0);
-        configuration.set(data.getKey() + ".Movement_Speed", scopeMovementSpeed);
     }
 }

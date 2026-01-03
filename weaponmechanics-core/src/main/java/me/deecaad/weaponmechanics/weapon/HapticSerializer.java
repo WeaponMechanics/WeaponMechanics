@@ -102,11 +102,18 @@ public class HapticSerializer implements Serializer<HapticSerializer> {
 
     @Override
     public @NotNull HapticSerializer serialize(@NotNull SerializeData data) throws SerializerException {
+        try {
+            Class.forName("org.vivecraft.api.data.VRBodyPart");
+        } catch (ClassNotFoundException e) {
+            throw data.exception("Part", "Tried to use haptics when Vivecraft_Spigot_Extensions was not installed",
+                    "Install here: https://www.spigotmc.org/resources/33166/");
+        }
+
         VRBodyPart part = data.of("Part").getEnum(VRBodyPart.class).orElse(null);
         float duration = (float) data.of("Duration").assertRange(0.0, null).assertExists().getDouble().orElseThrow();
         float frequency = (float) data.of("Frequency").assertRange(0.0, null).assertExists().getDouble().orElse(160.0F);
         float amplitude = (float) data.of("Amplitude").assertRange(0.0, null).assertExists().getDouble().orElse(1.0F);
         float delay = (float) data.of("Delay").assertRange(0.0, null).assertExists().getDouble().orElse(0.0F);
-        return new  HapticSerializer(part, duration, frequency, amplitude, delay);
+        return new HapticSerializer(part, duration, frequency, amplitude, delay);
     }
 }
