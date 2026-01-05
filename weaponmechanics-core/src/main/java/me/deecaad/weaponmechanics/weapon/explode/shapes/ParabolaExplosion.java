@@ -34,8 +34,11 @@ public class ParabolaExplosion implements ExplosionShape {
     }
 
     public ParabolaExplosion(double depth, double angle) {
-        if (depth <= 0.0) {
+        if (depth >= 0.0) {
             throw new IllegalArgumentException("Depth must be a non-zero, negative number");
+        }
+        if (angle <= 0.0) {
+            throw new IllegalArgumentException("Angle must be > 0.0");
         }
 
         this.depth = depth;
@@ -131,7 +134,7 @@ public class ParabolaExplosion implements ExplosionShape {
      * @return If the location is in the explosion
      */
     public boolean test(Location origin, Location loc) {
-        loc.subtract(origin);
+        loc.clone().subtract(origin);
         return test(loc.getX(), loc.getY(), loc.getZ());
     }
 
@@ -170,8 +173,13 @@ public class ParabolaExplosion implements ExplosionShape {
 
     @Override
     public @NotNull ExplosionShape serialize(@NotNull SerializeData data) throws SerializerException {
-        double depth = data.of("Depth").assertExists().assertRange(0.0, null).getDouble().getAsDouble();
-        double angle = data.of("Angle").assertExists().assertRange(0.0, null).getDouble().getAsDouble();
+        double depth = data.of("Depth").assertExists().getDouble().getAsDouble();
+        if (depth == 0.0)
+            throw data.exception("Depth", "Depth must be negative (non-zero), example: -5.0");
+
+        double angle = data.of("Angle").assertExists().getDouble().getAsDouble();
+        if (angle <= 0.0)
+            throw data.exception("Angle", "Angle must be > 0.0, example: 0.5");
 
         return new ParabolaExplosion(depth, angle);
     }
