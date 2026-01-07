@@ -134,8 +134,8 @@ public class ParabolaExplosion implements ExplosionShape {
      * @return If the location is in the explosion
      */
     public boolean test(Location origin, Location loc) {
-        loc.clone().subtract(origin);
-        return test(loc.getX(), loc.getY(), loc.getZ());
+        Location rel = loc.clone().subtract(origin);
+        return test(rel.getX(), rel.getY(), rel.getZ());
     }
 
     @Override
@@ -174,8 +174,8 @@ public class ParabolaExplosion implements ExplosionShape {
     @Override
     public @NotNull ExplosionShape serialize(@NotNull SerializeData data) throws SerializerException {
         double depth = data.of("Depth").assertExists().getDouble().getAsDouble();
-        if (depth == 0.0)
-            throw data.exception("Depth", "Depth must be negative (non-zero), example: -5.0");
+        if (depth >= 0.0)
+            throw data.exception("Depth", "Depth must be < 0.0, example: -5.0");
 
         double angle = data.of("Angle").assertExists().getDouble().getAsDouble();
         if (angle <= 0.0)
