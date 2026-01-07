@@ -301,7 +301,7 @@ object WeaponMechanicsCommand {
                         doubleArgument("radius", optional = true)
                         withOptionalArguments(commonExplosionArguments)
 
-                        entityExecutor { entity, args ->
+                        playerExecutor { entity, args ->
                             val origin = args["origin"] as? Location ?: entity.location
                             val radius = args["radius"] as? Double ?: 5.0
                             val exposure = args["exposure"] as? String ?: "default"
@@ -319,7 +319,7 @@ object WeaponMechanicsCommand {
                         doubleArgument("height", optional = true)
                         withOptionalArguments(commonExplosionArguments)
 
-                        entityExecutor { entity, args ->
+                        playerExecutor { entity, args ->
                             val origin = args["origin"] as? Location ?: entity.location
                             val width = args["width"] as? Double ?: 5.0
                             val height = args["height"] as? Double ?: 5.0
@@ -338,16 +338,16 @@ object WeaponMechanicsCommand {
                         doubleArgument("depth", optional = true)
                         withOptionalArguments(commonExplosionArguments)
 
-                        entityExecutor { entity, args ->
+                        playerExecutor { entity, args ->
                             val origin = args["origin"] as? Location ?: entity.location
-                            val angle = args["angle"] as? Double ?: 0.25
                             val depth = args["depth"] as? Double ?: -5.0
+                            val angle = args["angle"] as? Double ?: 0.25
                             val exposure = args["exposure"] as? String ?: "default"
                             val breakBlocks = args["break-blocks"] as? Boolean ?: true
                             val blackList = args["blacklist"] as? Predicate<Block> ?: Predicate { false }
                             val regen = args["regen"] as? Int ?: 200
 
-                            val shape = ParabolaExplosion(angle, depth)
+                            val shape = ParabolaExplosion(depth, angle)
                             explode(entity as LivingEntity, shape, origin, exposure, breakBlocks, blackList, regen)
                         }
                     }
@@ -357,8 +357,8 @@ object WeaponMechanicsCommand {
                         integerArgument("rays", 1, optional = true)
                         withOptionalArguments(commonExplosionArguments)
 
-                        entityExecutor { entity, args ->
-                            val origin = args["origin"] as? Location ?: entity.location
+                        playerExecutor { player, args ->
+                            val origin = args["origin"] as? Location ?: player.location
                             val yield = args["yield"] as? Double ?: 4.0
                             val rays = args["rays"] as? Int ?: 16
                             val exposure = args["exposure"] as? String ?: "default"
@@ -367,7 +367,7 @@ object WeaponMechanicsCommand {
                             val regen = args["regen"] as? Int ?: 200
 
                             val shape = DefaultExplosion(yield, rays)
-                            explode(entity as LivingEntity, shape, origin, exposure, breakBlocks, blackList, regen)
+                            explode(player as LivingEntity, shape, origin, exposure, breakBlocks, blackList, regen)
                         }
                     }
                 }
@@ -520,7 +520,7 @@ object WeaponMechanicsCommand {
                     doubleArgument("gravity", optional = true)
                     entityTypeArgument("disguise", optional = true)
 
-                    entityExecutor { entity, args ->
+                    playerExecutor { entity, args ->
                         val speed = args["speed"] as? Double ?: 1.0
                         val gravity = args["gravity"] as? Double ?: 0.0
                         val disguise = args["disguise"] as? EntityType
