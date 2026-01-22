@@ -51,13 +51,30 @@ public class TriggerPlayerListeners implements Listener {
         weaponHandler.getStatsHandler().load(playerWrapper);
     }
 
-    @EventHandler
-    public void quit(PlayerQuitEvent e) {
-        // Remove EntityWrapper data and cancel move task
-        Player player = e.getPlayer();
-        weaponHandler.getStatsHandler().save(WeaponMechanics.getInstance().getPlayerWrapper(player), false);
-        WeaponMechanics.getInstance().removeEntityWrapper(player);
+   @EventHandler
+public void quit(PlayerQuitEvent e) {
+    WeaponMechanics plugin = WeaponMechanics.getInstance();
+
+    // Remove wrapper first if plugin is disabled
+    if (!plugin.isEnabled()) {
+        plugin.removeEntityWrapper(e.getPlayer());
+        return;
     }
+
+    // Only save if database is initialized
+    if (plugin.getDatabase() != null) {
+        try {
+            PlayerWrapper wrapper = plugin.getPlayerWrapper(e.getPlayer());
+            if (wrapper != null) {
+                weaponHandler.getStatsHandler().save(wrapper, false);
+            }
+        } catch (Exception ignored) {
+            // Safe fail during reload
+        }
+    }
+
+    plugin.removeEntityWrapper(e.getPlayer());
+}
 
     @EventHandler(ignoreCancelled = true)
     public void toggleSneak(PlayerToggleSneakEvent e) {
