@@ -1,5 +1,6 @@
 package me.deecaad.weaponmechanics.weapon.damage;
 
+import com.google.common.base.Function;
 import me.deecaad.core.file.Configuration;
 import me.deecaad.core.utils.NumberUtil;
 import me.deecaad.core.utils.RandomUtil;
@@ -37,6 +38,8 @@ import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
+import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.Set;
 
 public class DamageUtil {
@@ -151,7 +154,21 @@ public class DamageUtil {
             }
 
 
-            var entityDamageByEntityEvent = new EntityDamageByEntityEvent(source.getShooter(), victim, cause, bukkitSource.build(), Collections.singletonMap(EntityDamageEvent.DamageModifier.BASE, damage), Collections.singletonMap(EntityDamageEvent.DamageModifier.BASE, it -> it), false);
+            var damageMap = new EnumMap<EntityDamageEvent.DamageModifier, Double>(EntityDamageEvent.DamageModifier.class);
+            damageMap.put(EntityDamageEvent.DamageModifier.BASE, damage);
+
+            var modifierMap = new HashMap<EntityDamageEvent.DamageModifier, Function<? super Double, Double>>();
+            modifierMap.put(EntityDamageEvent.DamageModifier.BASE, it -> it);
+
+            var entityDamageByEntityEvent = new EntityDamageByEntityEvent(
+                    source.getShooter(),
+                    victim,
+                    cause,
+                    bukkitSource.build(),
+                    damageMap,
+                    modifierMap,
+                    false
+            );
             victim.setMetadata("doing-weapon-damage", new LazyMetadataValue(WeaponMechanics.getInstance(), () -> true));
             Bukkit.getPluginManager().callEvent(entityDamageByEntityEvent);
             victim.removeMetadata("doing-weapon-damage", WeaponMechanics.getInstance());
