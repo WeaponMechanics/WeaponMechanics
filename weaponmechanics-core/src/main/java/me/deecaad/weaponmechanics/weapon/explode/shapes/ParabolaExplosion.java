@@ -173,14 +173,8 @@ public class ParabolaExplosion implements ExplosionShape {
 
     @Override
     public @NotNull ExplosionShape serialize(@NotNull SerializeData data) throws SerializerException {
-        double depth = data.of("Depth").assertExists().getDouble().getAsDouble();
-        if (depth >= 0.0)
-            throw data.exception("Depth", "Depth must be < 0.0, example: -5.0");
-
-        double angle = data.of("Angle").assertExists().getDouble().getAsDouble();
-        if (angle <= 0.0)
-            throw data.exception("Angle", "Angle must be > 0.0, example: 0.5");
-
+        double depth = data.of("Depth").assertExists().assertRange(null, 0.0).getDouble().getAsDouble();
+        double angle = data.of("Angle").assertExists().assertRange(0.0, null).getDouble().getAsDouble();
         return new ParabolaExplosion(depth, angle);
     }
 
