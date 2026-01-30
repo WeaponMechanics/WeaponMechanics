@@ -36,7 +36,9 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collections;
+import com.google.common.base.Function;
+
+import java.util.EnumMap;
 import java.util.Set;
 
 public class DamageUtil {
@@ -131,36 +133,63 @@ public class DamageUtil {
         // Used to check if a plugin changed the amount of damage
         double tempDamage = damage;
 
-        if (source.getShooter() != null) {
+        var shooter = source.getShooter();
+        if (shooter != null) {
+
             var cause = switch (source.getDamageType()) {
                 case MELEE -> EntityDamageEvent.DamageCause.ENTITY_ATTACK;
                 case PROJECTILE -> EntityDamageEvent.DamageCause.PROJECTILE;
                 case EXPLOSION -> EntityDamageEvent.DamageCause.ENTITY_EXPLOSION;
             };
+
             var bukkitDamageType = switch (source.getDamageType()) {
-                case MELEE -> source.getShooter() instanceof Player ? DamageType.PLAYER_ATTACK : DamageType.MOB_ATTACK;
+                case MELEE -> shooter instanceof Player ? DamageType.PLAYER_ATTACK : DamageType.MOB_ATTACK;
                 case PROJECTILE -> DamageType.MOB_PROJECTILE;
-                case EXPLOSION -> source.getShooter() instanceof Player ? DamageType.PLAYER_EXPLOSION : DamageType.EXPLOSION;
+                case EXPLOSION -> shooter instanceof Player ? DamageType.PLAYER_EXPLOSION : DamageType.EXPLOSION;
             };
+
             var bukkitSource = DamageSource.builder(bukkitDamageType);
+
             if (source.getDamageLocation() != null) {
                 bukkitSource.withDamageLocation(source.getDamageLocation());
             }
-            if (source.getShooter() != null) {
-                bukkitSource.withCausingEntity(source.getShooter()).withDirectEntity(source.getShooter());
+
+            // We don't have a real Bukkit projectile entity here, so shooter is used
+            bukkitSource.withCausingEntity(shooter).withDirectEntity(shooter);
+
+            // Mutable function because other plugins can call event.setDamage(...)
+            var damageModifiers = new EnumMap<EntityDamageEvent.DamageModifier, Double>(EntityDamageEvent.DamageModifier.class);
+            damageModifiers.put(EntityDamageEvent.DamageModifier.BASE, damage);
+
+            Function<Double, Double> identity = d -> d;
+            var damageModifierFunctions =
+                    new EnumMap<EntityDamageEvent.DamageModifier, Function<? super Double, Double>>(EntityDamageEvent.DamageModifier.class);
+            damageModifierFunctions.put(EntityDamageEvent.DamageModifier.BASE, identity);
+
+            var event = new EntityDamageByEntityEvent(
+                    shooter,
+                    victim,
+                    cause,
+                    bukkitSource.build(),
+                    damageModifiers,
+                    damageModifierFunctions,
+                    false
+            );
+
+            victim.setMetadata("doing-weapon-damage", new LazyMetadataValue(WeaponMechanics.getInstance(), () -> true));
+            try {
+                Bukkit.getPluginManager().callEvent(event);
+            } finally {
+                victim.removeMetadata("doing-weapon-damage", WeaponMechanics.getInstance());
             }
 
-
-            var entityDamageByEntityEvent = new EntityDamageByEntityEvent(source.getShooter(), victim, cause, bukkitSource.build(), Collections.singletonMap(EntityDamageEvent.DamageModifier.BASE, damage), Collections.singletonMap(EntityDamageEvent.DamageModifier.BASE, it -> it), false);
-            victim.setMetadata("doing-weapon-damage", new LazyMetadataValue(WeaponMechanics.getInstance(), () -> true));
-            Bukkit.getPluginManager().callEvent(entityDamageByEntityEvent);
-            victim.removeMetadata("doing-weapon-damage", WeaponMechanics.getInstance());
-            if (entityDamageByEntityEvent.isCancelled())
+            if (event.isCancelled())
                 return true;
 
-            // Plugins may modify the event... So let's update our variables
-            // no longer using this since we do not even pass damage... just check if the damage is cancelled.
-            // damage = entityDamageByEntityEvent.getDamage();
+            // Honor other plugins that might change this
+            damage = event.getFinalDamage();
+            if (!Double.isFinite(damage) || damage <= 0.0)
+                return true;
         }
 
         // If a plugin modified the damage, and set it to 0.0, just cancel
