@@ -57,6 +57,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.permissions.Permission;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.jetbrains.annotations.NotNull;
@@ -418,6 +419,20 @@ public class WeaponMechanics extends MechanicsPlugin {
                         PlayerWrapper playerWrapper = getPlayerWrapper(player);
                         weaponHandler.getStatsHandler().load(playerWrapper);
                     }
+
+                    // Reload other MechanicsPlugin instances (e.g. WeaponMechanicsPlus, WeaponMechanicsCosmetics)
+                    // so that their configs (such as attachment configurations) are also refreshed.
+                    for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
+                        if (plugin instanceof MechanicsPlugin && plugin != this && plugin != MechanicsCore.getInstance()) {
+                            debugger.info("Reloading dependent plugin: " + plugin.getName());
+                            try {
+                                ((MechanicsPlugin) plugin).reload().join();
+                            } catch (Exception e) {
+                                debugger.warning("Failed to reload " + plugin.getName(), e);
+                            }
+                        }
+                    }
+
                     return CompletableFuture.completedFuture(null);
                 });
     }
