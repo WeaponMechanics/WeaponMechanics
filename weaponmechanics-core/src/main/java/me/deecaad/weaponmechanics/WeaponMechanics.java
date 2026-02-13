@@ -422,18 +422,22 @@ public class WeaponMechanics extends MechanicsPlugin {
 
                     // Reload other MechanicsPlugin instances (e.g. WeaponMechanicsPlus, WeaponMechanicsCosmetics)
                     // so that their configs (such as attachment configurations) are also refreshed.
+                    // IMPORTANT: We must NOT use .join() here as it would deadlock the server thread.
+                    // Instead, chain reloads asynchronously using thenCompose.
+                    CompletableFuture<?> reloadChain = CompletableFuture.completedFuture(null);
                     for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
                         if (plugin instanceof MechanicsPlugin && plugin != this && plugin != MechanicsCore.getInstance()) {
-                            debugger.info("Reloading dependent plugin: " + plugin.getName());
-                            try {
-                                ((MechanicsPlugin) plugin).reload().join();
-                            } catch (Exception e) {
-                                debugger.warning("Failed to reload " + plugin.getName(), e);
-                            }
+                            final MechanicsPlugin mechanicsPlugin = (MechanicsPlugin) plugin;
+                            reloadChain = reloadChain.thenCompose(ignored -> {
+                                debugger.info("Reloading dependent plugin: " + mechanicsPlugin.getName());
+                                return mechanicsPlugin.reload().exceptionally(ex -> {
+                                    debugger.warning("Failed to reload " + mechanicsPlugin.getName(), (Exception) ex);
+                                    return null;
+                                });
+                            });
                         }
                     }
-
-                    return CompletableFuture.completedFuture(null);
+                    return reloadChain.thenApply(ignored -> null);
                 });
     }
 
