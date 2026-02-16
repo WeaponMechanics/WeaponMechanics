@@ -330,7 +330,7 @@ public class BlockDamage implements Serializer<BlockDamage> {
             .addArgument(new EnumValueSerializer<>(BreakMode.class, false))
             .requireAllPreviousArgs()
             .addArgument(new IntSerializer(1))
-            .addArgument(new RegistryValueSerializer<>(BlockType.class, false))
+            .addArgument(new EnumValueSerializer<>(Material.class, false))
             .assertExists().assertList();
 
         for (int i = 0; i < list.size(); i++) {
@@ -339,13 +339,19 @@ public class BlockDamage implements Serializer<BlockDamage> {
             List<BlockType> materials = (List<BlockType>) split.get(0).get();
             BreakMode mode = ((List<BreakMode>) split.get(1).get()).getFirst();
             Optional<Integer> blockDurability = (Optional<Integer>) (Optional<?>) split.get(2);
-            Material mask = (Material) split.get(3).orElse(null);
+            List<Material> maskList = (List<Material>) split.get(3).orElse(null);
+            Material mask = (maskList == null || maskList.isEmpty()) ? null : maskList.getFirst();
 
             // Cannot apply a mask to blocks that cannot be broken
             if (mode != BreakMode.BREAK && mask != null) {
                 throw data.listException("Blocks", i, "You cannot use material masks with '" + mode + "'",
                     "Found mask: " + mask,
                     "In order to use masks, use 'BREAK' mode");
+            }
+
+            if (mask != null && !mask.isBlock()) {
+                throw data.listException("Blocks", i, "Mask must be a block material",
+                        "Found mask: " + mask);
             }
 
             // Cannot use durability or masks with blocks that cancel durability
