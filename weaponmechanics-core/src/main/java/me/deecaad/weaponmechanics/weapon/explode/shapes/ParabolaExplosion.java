@@ -173,8 +173,13 @@ public class ParabolaExplosion implements ExplosionShape {
 
     @Override
     public @NotNull ExplosionShape serialize(@NotNull SerializeData data) throws SerializerException {
-        double depth = data.of("Depth").assertExists().assertRange(null, 0.0).getDouble().getAsDouble();
+        double depth = data.of("Depth").assertExists().getDouble().getAsDouble();
         double angle = data.of("Angle").assertExists().assertRange(0.0, null).getDouble().getAsDouble();
+
+        // ok so this is here for legacy reasons. Old configs used positive
+        // numbers, we expect negative... blablabla... just normalize
+        depth = -Math.abs(depth);
+
         return new ParabolaExplosion(depth, angle);
     }
 
