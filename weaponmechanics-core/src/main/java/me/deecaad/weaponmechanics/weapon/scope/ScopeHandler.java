@@ -13,7 +13,6 @@ import me.deecaad.core.placeholder.PlaceholderData;
 import me.deecaad.core.placeholder.PlaceholderMessage;
 import me.deecaad.core.utils.NumberUtil;
 import me.deecaad.weaponmechanics.WeaponMechanics;
-import me.deecaad.weaponmechanics.weapon.HapticSerializer;
 import me.deecaad.weaponmechanics.weapon.WeaponHandler;
 import me.deecaad.weaponmechanics.weapon.trigger.Trigger;
 import me.deecaad.weaponmechanics.weapon.trigger.TriggerListener;

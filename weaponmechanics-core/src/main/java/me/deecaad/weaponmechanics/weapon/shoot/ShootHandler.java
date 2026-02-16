@@ -571,9 +571,11 @@ public class ShootHandler implements IValidator, TriggerListener {
             WeaponMechanics.getInstance().debugger.severe(weaponTitle + ".Shoot.Projectiles_Per_Shot should be at least 1, got " + prepareEvent.getProjectileAmount());
         }
 
-        HapticSerializer haptic = config.getObject(weaponTitle + ".Shoot.Haptic", HapticSerializer.class);
-        if (haptic != null) {
-            haptic.sendHapticPulse(weaponTitle, weaponStack, livingEntity, slot);
+        if (Bukkit.getPluginManager().getPlugin("Vivecraft_Spigot_Extensions") != null) {
+            HapticSerializer haptic = config.getObject(weaponTitle + ".Shoot.Haptic", HapticSerializer.class);
+            if (haptic != null) {
+                haptic.sendHapticPulse(weaponTitle, weaponStack, livingEntity, slot);
+            }
         }
 
         // Consumables can have no projectile, so only try to fire bullets if there is a projectile
@@ -806,7 +808,12 @@ public class ShootHandler implements IValidator, TriggerListener {
 
         configuration.set(data.getKey() + ".Reset_Fall_Distance", data.of("Reset_Fall_Distance").getBool().orElse(false));
 
-        configuration.set(data.getKey() + ".Haptic", data.of("Haptic").serialize(HapticSerializer.class).orElse(null));
+        if (Bukkit.getPluginManager().getPlugin("Vivecraft_Spigot_Extensions") != null) {
+            configuration.set(data.getKey() + ".Haptic", data.of("Haptic").serialize(HapticSerializer.class).orElse(null));
+        } else if (data.has("Haptic")) {
+            throw data.exception("Haptic", "Tried to use haptics when Vivecraft_Spigot_Extensions was not installed",
+                "Install here: https://www.spigotmc.org/resources/33166/");
+        }
     }
 
     private boolean isInvalidFullAuto(TriggerType triggerType) {
