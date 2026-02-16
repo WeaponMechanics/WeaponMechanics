@@ -57,6 +57,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.permissions.Permission;
+import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.jetbrains.annotations.NotNull;
@@ -232,6 +233,8 @@ public class WeaponMechanics extends MechanicsPlugin {
         long weapons = weaponConfigurations.values().stream().filter(WeaponSerializer.class::isInstance).count();
         debugger.info("Loaded " + weapons + " weapons");
 
+        registerWeaponPermissions(true);
+
         return CompletableFuture.completedFuture(null);
     }
 
@@ -306,34 +309,41 @@ public class WeaponMechanics extends MechanicsPlugin {
         return super.handlePacketListeners();
     }
 
-    private int permissionFails;
-
     @Override
     public @NotNull CompletableFuture<Void> handlePermissions() {
         debugger.fine("Registering permissions");
+        registerWeaponPermissions(false);
+        return super.handlePermissions();
+    }
 
-        Permission parent = Bukkit.getPluginManager().getPermission("weaponmechanics.use.*");
+    private void registerWeaponPermissions(boolean reCalculateOnlinePlayers) {
+        if (weaponHandler == null) return;
+
+        PluginManager pm = Bukkit.getPluginManager();
+
+        Permission parent = pm.getPermission("weaponmechanics.use.*");
         if (parent == null) {
-            // Some older versions register permissions after onEnable...
-            if (permissionFails++ > 1)
-                debugger.warning("Could not register permissions... Waiting 1 tick and trying again.");
-            return super.handlePermissions();
+            parent = new Permission("weaponmechanics.use.*", "Allows using all WeaponMechanics weapons", PermissionDefault.OP);
+            pm.addPermission(parent);
         }
-
-        permissionFails = 0;
 
         for (String weaponTitle : weaponHandler.getInfoHandler().getSortedWeaponList()) {
-            String permissionName = "weaponmechanics.use." + weaponTitle;
-            Permission permission = Bukkit.getPluginManager().getPermission(permissionName);
+            String node = "weaponmechanics.use." + weaponTitle;
 
-            if (permission == null) {
-                permission = new Permission(permissionName, "Permission to use " + weaponTitle);
-                Bukkit.getPluginManager().addPermission(permission);
+            Permission perm = pm.getPermission(node);
+            if (perm == null) {
+                perm = new Permission(node, "Permission to use " + weaponTitle, PermissionDefault.FALSE);
+                pm.addPermission(perm);
             }
 
-            permission.addParent(parent, true);
+            perm.addParent(parent, true);
         }
-        return super.handlePermissions();
+
+        if (reCalculateOnlinePlayers) {
+            for (Player p : Bukkit.getOnlinePlayers()) {
+                p.recalculatePermissions();
+            }
+        }
     }
 
     @Override
@@ -544,14 +554,20 @@ public class WeaponMechanics extends MechanicsPlugin {
     public @NotNull PlayerWrapper getPlayerWrapper(@NotNull Player player) {
         EntityWrapper wrapper = entityWrappers.get(player);
         if (wrapper == null) {
-            wrapper = new PlayerWrapper(player);
-            entityWrappers.put(player, wrapper);
+            PlayerWrapper pw = new PlayerWrapper(player);
+            entityWrappers.put(player, pw);
+            return pw;
         }
-        if (!(wrapper instanceof PlayerWrapper)) {
+        if (!(wrapper instanceof PlayerWrapper pw)) {
             // Exception is better in this case as we need to know where this mistake happened
             throw new IllegalArgumentException("Tried to get PlayerWrapper from player which didn't have PlayerWrapper (only EntityWrapper)...?");
         }
-        return (PlayerWrapper) wrapper;
+        if (pw.getPlayer() != player) {
+            removeEntityWrapper(player);
+            pw = new PlayerWrapper(player);
+            entityWrappers.put(player, pw);
+        }
+        return pw;
     }
 
     /**
