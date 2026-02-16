@@ -874,3 +874,42 @@ Entity_Hitboxes:
     ARMS: false
     LEGS: 0.0
     FEET: 0.0
+  CAMEL_HUSK: # Same as camel
+    Horizontal_Entity: true
+    HEAD: 0.0
+    BODY: 0.5
+    ARMS: true
+    LEGS: 0.45
+    FEET: 0.05
+  COPPER_GOLEM:
+    Horizontal_Entity: false
+    HEAD: 0.28
+    BODY: 0.50
+    LEGS: 0.17
+    FEET: 0.05
+  MANNEQUIN: # Literally copy-paste PLAYER
+    Horizontal_Entity: false
+    HEAD: 0.25
+    BODY: 0.375
+    ARMS: true
+    LEGS: 0.25
+    FEET: 0.125
+  NAUTILUS:
+    Horizontal_Entity: true
+    HEAD: 0.0
+    BODY: 1.0
+    LEGS: 0.0
+    FEET: 0.0
+  ZOMBIE_NAUTILUS:
+    Horizontal_Entity: true
+    HEAD: 0.0
+    BODY: 1.0
+    LEGS: 0.0
+    FEET: 0.0
+  PARCHED: # Same as SKELETON
+    Horizontal_Entity: false
+    HEAD: 0.25
+    BODY: 0.375
+    ARMS: true
+    LEGS: 0.25
+    FEET: 0.125
