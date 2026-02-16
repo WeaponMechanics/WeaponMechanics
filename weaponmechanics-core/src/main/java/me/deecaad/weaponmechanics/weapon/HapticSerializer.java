@@ -11,29 +11,20 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.vivecraft.api.VRAPI;
-import org.vivecraft.api.data.VRBodyPart;
-
-import java.util.EnumMap;
-import java.util.Map;
 
 /**
  * Integrates with Vivecraft_Spigot_Extensions to send haptic pulses to a player's
  * controller.
  *
+ * <p>All ViveCraft API references are deferred to avoid {@link NoClassDefFoundError}
+ * when ViveCraft is not installed on the server.
+ *
  * @see <a href="https://vivecraft.github.io/spigot-javadoc/org/vivecraft/api/VRAPI.html#sendHapticPulse(org.bukkit.entity.Player,org.vivecraft.api.data.VRBodyPart,float,float,float,float)">...</a>
  */
 public class HapticSerializer implements Serializer<HapticSerializer> {
 
-    private static final Map<EquipmentSlot, VRBodyPart> SLOT_TO_VR_MAP = new EnumMap<>(EquipmentSlot.class);
-
-    static {
-        // TODO: group these smarter?
-        SLOT_TO_VR_MAP.put(EquipmentSlot.HAND, VRBodyPart.MAIN_HAND);
-        SLOT_TO_VR_MAP.put(EquipmentSlot.OFF_HAND, VRBodyPart.OFF_HAND);
-    }
-
-    private VRBodyPart part;
+    // Store the VRBodyPart as Object to avoid class loading ViveCraft at class init time
+    private Object part;
     private float duration;
     private float frequency;
     private float amplitude;
@@ -45,7 +36,7 @@ public class HapticSerializer implements Serializer<HapticSerializer> {
     public HapticSerializer() {
     }
 
-    public HapticSerializer(VRBodyPart part, float duration, float frequency, float amplitude, float delay) {
+    public HapticSerializer(Object part, float duration, float frequency, float amplitude, float delay) {
         this.part = part;
         this.duration = duration;
         this.frequency = frequency;
@@ -53,7 +44,7 @@ public class HapticSerializer implements Serializer<HapticSerializer> {
         this.delay = delay;
     }
 
-    public VRBodyPart getPart() {
+    public Object getPart() {
         return part;
     }
 
@@ -77,27 +68,8 @@ public class HapticSerializer implements Serializer<HapticSerializer> {
         if (!(shooter instanceof Player player))
             return;
 
-        WeaponHapticEvent e = new WeaponHapticEvent(weaponTitle, weaponStack, shooter, hand, part, duration, frequency, amplitude, delay);
-        Bukkit.getPluginManager().callEvent(e);
-        if (e.isCancelled())
-            return;
-
-        VRBodyPart part = e.getPart();
-        if (part == null) {
-            if (hand == null)
-                throw new IllegalArgumentException("Found a haptic with no specific body part defined... This is likely a config error.");
-
-            part = SLOT_TO_VR_MAP.get(hand);
-        }
-
-        // If no body part is available, haptic everything
-        if (part == null) {
-            for (VRBodyPart vrPart : VRBodyPart.values()) {
-                VRAPI.instance().sendHapticPulse(player, vrPart, e.getDuration(), e.getFrequency(), e.getAmplitude(), e.getDelay());
-            }
-        } else {
-            VRAPI.instance().sendHapticPulse(player, part, e.getDuration(), e.getFrequency(), e.getAmplitude(), e.getDelay());
-        }
+        // All ViveCraft API usage is inside this inner class to defer class loading
+        ViveCraftHelper.sendPulse(this, weaponTitle, weaponStack, player, hand);
     }
 
     @Override
@@ -109,11 +81,56 @@ public class HapticSerializer implements Serializer<HapticSerializer> {
                     "Install here: https://www.spigotmc.org/resources/33166/");
         }
 
-        VRBodyPart part = data.of("Part").getEnum(VRBodyPart.class).orElse(null);
-        float duration = (float) data.of("Duration").assertRange(0.0, null).assertExists().getDouble().orElseThrow();
-        float frequency = (float) data.of("Frequency").assertRange(0.0, null).assertExists().getDouble().orElse(160.0F);
-        float amplitude = (float) data.of("Amplitude").assertRange(0.0, null).assertExists().getDouble().orElse(1.0F);
-        float delay = (float) data.of("Delay").assertRange(0.0, null).assertExists().getDouble().orElse(0.0F);
-        return new HapticSerializer(part, duration, frequency, amplitude, delay);
+        // ViveCraft is confirmed present, safe to use ViveCraft types now
+        return ViveCraftHelper.doSerialize(data);
+    }
+
+    /**
+     * Inner helper class that isolates all ViveCraft API references.
+     * This class is only loaded when ViveCraft is confirmed to be present,
+     * preventing NoClassDefFoundError at HapticSerializer class init time.
+     */
+    static class ViveCraftHelper {
+
+        static HapticSerializer doSerialize(SerializeData data) throws SerializerException {
+            org.vivecraft.api.data.VRBodyPart part = data.of("Part").getEnum(org.vivecraft.api.data.VRBodyPart.class).orElse(null);
+            float duration = (float) data.of("Duration").assertRange(0.0, null).assertExists().getDouble().orElseThrow();
+            float frequency = (float) data.of("Frequency").assertRange(0.0, null).assertExists().getDouble().orElse(160.0F);
+            float amplitude = (float) data.of("Amplitude").assertRange(0.0, null).assertExists().getDouble().orElse(1.0F);
+            float delay = (float) data.of("Delay").assertRange(0.0, null).assertExists().getDouble().orElse(0.0F);
+            return new HapticSerializer(part, duration, frequency, amplitude, delay);
+        }
+
+        static void sendPulse(HapticSerializer haptic, String weaponTitle, ItemStack weaponStack, Player player, EquipmentSlot hand) {
+            org.vivecraft.api.data.VRBodyPart vrPart = (org.vivecraft.api.data.VRBodyPart) haptic.part;
+
+            WeaponHapticEvent e = new WeaponHapticEvent(weaponTitle, weaponStack, player, hand, vrPart,
+                    haptic.duration, haptic.frequency, haptic.amplitude, haptic.delay);
+            Bukkit.getPluginManager().callEvent(e);
+            if (e.isCancelled())
+                return;
+
+            org.vivecraft.api.data.VRBodyPart eventPart = e.getPart();
+            if (eventPart == null) {
+                if (hand == null)
+                    throw new IllegalArgumentException("Found a haptic with no specific body part defined... This is likely a config error.");
+
+                // Map EquipmentSlot to VRBodyPart
+                eventPart = switch (hand) {
+                    case HAND -> org.vivecraft.api.data.VRBodyPart.MAIN_HAND;
+                    case OFF_HAND -> org.vivecraft.api.data.VRBodyPart.OFF_HAND;
+                    default -> null;
+                };
+            }
+
+            // If no body part is available, haptic everything
+            if (eventPart == null) {
+                for (org.vivecraft.api.data.VRBodyPart part : org.vivecraft.api.data.VRBodyPart.values()) {
+                    org.vivecraft.api.VRAPI.instance().sendHapticPulse(player, part, e.getDuration(), e.getFrequency(), e.getAmplitude(), e.getDelay());
+                }
+            } else {
+                org.vivecraft.api.VRAPI.instance().sendHapticPulse(player, eventPart, e.getDuration(), e.getFrequency(), e.getAmplitude(), e.getDelay());
+            }
+        }
     }
 }

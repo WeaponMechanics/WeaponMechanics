@@ -57,6 +57,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.permissions.Permission;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.jetbrains.annotations.NotNull;
@@ -418,7 +419,25 @@ public class WeaponMechanics extends MechanicsPlugin {
                         PlayerWrapper playerWrapper = getPlayerWrapper(player);
                         weaponHandler.getStatsHandler().load(playerWrapper);
                     }
-                    return CompletableFuture.completedFuture(null);
+
+                    // Reload other MechanicsPlugin instances (e.g. WeaponMechanicsPlus, WeaponMechanicsCosmetics)
+                    // so that their configs (such as attachment configurations) are also refreshed.
+                    // IMPORTANT: We must NOT use .join() here as it would deadlock the server thread.
+                    // Instead, chain reloads asynchronously using thenCompose.
+                    CompletableFuture<?> reloadChain = CompletableFuture.completedFuture(null);
+                    for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
+                        if (plugin instanceof MechanicsPlugin && plugin != this && plugin != MechanicsCore.getInstance()) {
+                            final MechanicsPlugin mechanicsPlugin = (MechanicsPlugin) plugin;
+                            reloadChain = reloadChain.thenCompose(ignored -> {
+                                debugger.info("Reloading dependent plugin: " + mechanicsPlugin.getName());
+                                return mechanicsPlugin.reload().exceptionally(ex -> {
+                                    debugger.warning("Failed to reload " + mechanicsPlugin.getName(), (Exception) ex);
+                                    return null;
+                                });
+                            });
+                        }
+                    }
+                    return reloadChain.thenApply(ignored -> null);
                 });
     }
 

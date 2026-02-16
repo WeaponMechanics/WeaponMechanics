@@ -7,13 +7,19 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.vivecraft.api.data.VRBodyPart;
 
+/**
+ * Event fired when a haptic pulse is about to be sent via ViveCraft.
+ *
+ * <p>The {@code part} field stores a {@code VRBodyPart} as {@link Object}
+ * to avoid loading ViveCraft classes when ViveCraft is not installed.
+ */
 public class WeaponHapticEvent extends WeaponEvent implements Cancellable {
 
     private static final HandlerList HANDLERS = new HandlerList();
 
-    private @Nullable VRBodyPart part;
+    // Stored as Object to avoid NoClassDefFoundError when ViveCraft is not installed
+    private @Nullable Object part;
     private float duration;
     private float frequency;
     private float amplitude;
@@ -21,7 +27,7 @@ public class WeaponHapticEvent extends WeaponEvent implements Cancellable {
 
     private boolean cancelled;
 
-    public WeaponHapticEvent(String weaponTitle, ItemStack weaponStack, LivingEntity shooter, EquipmentSlot hand, @Nullable VRBodyPart part, float duration, float frequency, float amplitude, float delay) {
+    public WeaponHapticEvent(String weaponTitle, ItemStack weaponStack, LivingEntity shooter, EquipmentSlot hand, @Nullable Object part, float duration, float frequency, float amplitude, float delay) {
         super(weaponTitle, weaponStack, shooter, hand);
         this.part = part;
         this.duration = duration;
@@ -30,11 +36,16 @@ public class WeaponHapticEvent extends WeaponEvent implements Cancellable {
         this.delay = delay;
     }
 
-    public @Nullable VRBodyPart getPart() {
-        return part;
+    /**
+     * Returns the VRBodyPart (as Object to avoid ViveCraft class dependency).
+     * Cast to {@code org.vivecraft.api.data.VRBodyPart} when ViveCraft is present.
+     */
+    @SuppressWarnings("unchecked")
+    public <T> @Nullable T getPart() {
+        return (T) part;
     }
 
-    public void setPart(@Nullable VRBodyPart part) {
+    public void setPart(@Nullable Object part) {
         this.part = part;
     }
 
@@ -89,3 +100,4 @@ public class WeaponHapticEvent extends WeaponEvent implements Cancellable {
         return HANDLERS;
     }
 }
+
