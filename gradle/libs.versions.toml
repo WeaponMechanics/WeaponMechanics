@@ -22,7 +22,7 @@ foliaScheduler = "0.7.5"
 gson = "2.13.1"
 hikariCp = "5.1.0"
 jsonSimple = "1.1.1"
-kotlin = "1.9.23"
+kotlin = "2.3.10"
 xSeries = "13.6.0"
 
 
