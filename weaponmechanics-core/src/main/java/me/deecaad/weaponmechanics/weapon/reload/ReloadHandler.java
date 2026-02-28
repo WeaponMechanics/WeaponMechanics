@@ -565,6 +565,10 @@ public class ReloadHandler implements IValidator, TriggerListener {
         if (otherWeapon == null)
             return;
 
+        Configuration config = WeaponMechanics.getInstance().getWeaponConfigurations();
+        if (!config.getBoolean(otherWeapon + ".Reload.Auto_Reload_When_Empty"))
+            return;
+
         // If other weapon isn't empty, don't automatically try to reload
         if (getAmmoLeft(otherStack, otherWeapon) != 0)
             return;
@@ -590,6 +594,9 @@ public class ReloadHandler implements IValidator, TriggerListener {
         int magazineSize = data.of("Magazine_Size").assertExists().assertRange(1, null).getInt().getAsInt();
         int reloadDuration = data.of("Reload_Duration").assertExists().assertRange(1, null).getInt().getAsInt();
         int ammoPerReload = data.of("Ammo_Per_Reload").assertRange(1, null).getInt().orElse(-1);
+
+        boolean autoReloadWhenEmpty = data.of("Auto_Reload_When_Empty").getBool().orElse(true);
+        configuration.set(data.getKey() + ".Auto_Reload_When_Empty", autoReloadWhenEmpty);
 
         boolean unloadAmmoOnReload = data.of("Unload_Ammo_On_Reload").getBool().orElse(false);
         if (unloadAmmoOnReload && ammoPerReload != -1) {

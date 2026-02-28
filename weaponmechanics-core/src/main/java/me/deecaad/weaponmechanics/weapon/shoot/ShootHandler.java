@@ -481,6 +481,10 @@ public class ShootHandler implements IValidator, TriggerListener {
         if (entityWrapper.isReloading())
             return;
 
+        Configuration config = WeaponMechanics.getInstance().getWeaponConfigurations();
+        if (!config.getBoolean(weaponTitle + ".Reload.Auto_Reload_When_Empty"))
+            return;
+
         ReloadHandler reloadHandler = weaponHandler.getReloadHandler();
 
         HandData handData = slot == EquipmentSlot.HAND ? entityWrapper.getMainHandData() : entityWrapper.getOffHandData();
