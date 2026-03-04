@@ -327,6 +327,35 @@ public class WeaponProjectile extends AProjectile {
         return rolling;
     }
 
+    private static boolean isWater(Block block) {
+        if (block == null) return false;
+
+        String name = block.getType().name();
+        if (name.equals("BUBBLE_COLUMN")) return true;
+
+        if (block.isLiquid()) {
+            return name.equals("WATER") || name.equals("STATIONARY_WATER") || name.endsWith("_WATER");
+        }
+
+        var data = block.getBlockData();
+        return (data instanceof org.bukkit.block.data.Waterlogged wl) && wl.isWaterlogged();
+    }
+
+    private void tryExtinguishInWater(Block block) {
+        if (!isWater(block)) return;
+        if (!projectileSettings.isExtinguishInWater()) return;
+
+        var disguise = getDisguise();
+        if (disguise != null && disguise.isOnFire()) {
+            disguise.setOnFire(false);
+            disguise.updateMeta();
+        }
+
+        if (projectileSettings.isIncendiaryProjectile()) {
+            getProjectileSettings().setIncendiaryProjectile(false);
+        }
+    }
+
     @Override
     public boolean updatePosition() {
 
@@ -335,6 +364,10 @@ public class WeaponProjectile extends AProjectile {
             // Remove projectile if next location would be in unloaded chunk
             return true;
         }
+
+        tryExtinguishInWater(getCurrentBlock());
+        Block nextBlock = possibleNextLocation.toLocation(getWorld()).getBlock();
+        tryExtinguishInWater(nextBlock);
 
         if (stickedData != null) {
             Vector newLocation = stickedData.getNewLocation();
@@ -388,8 +421,11 @@ public class WeaponProjectile extends AProjectile {
             onCollide(hit);
 
             // We only want to let onCollide to be called onLiquid hits
-            if (hit instanceof BlockTraceResult blockHit && blockHit.getBlock().isLiquid()) {
-                continue;
+            if (hit instanceof BlockTraceResult blockHit) {
+                tryExtinguishInWater(blockHit.getBlock());
+                if (blockHit.getBlock().isLiquid()) {
+                    continue;
+                }
             }
 
             // Returned true and that most likely means that block hit was cancelled, skipping...

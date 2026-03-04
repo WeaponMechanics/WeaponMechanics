@@ -283,7 +283,7 @@ public class ScopeHandler implements IValidator, TriggerListener {
             player.isFlying(),
             player.getAllowFlight(),
             player.getGameMode() == GameMode.CREATIVE,
-            player.getFlySpeed(),
+            player.getFlySpeed() / 2,
             player.getWalkSpeed() / 2 // divide by 2, since spigot multiplies this by 2
         );
 
