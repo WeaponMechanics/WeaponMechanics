@@ -37,6 +37,8 @@ public class ProjectileSettings implements Serializer<ProjectileSettings>, Clone
     private int maximumAliveTicks;
     private double maximumTravelDistance;
     private double size;
+    private boolean incendiaryProjectile;
+    private boolean extinguishInWater = true;
 
     /**
      * Empty constructor to be used as serializer
@@ -47,7 +49,7 @@ public class ProjectileSettings implements Serializer<ProjectileSettings>, Clone
     public ProjectileSettings(EntityType projectileDisguise, Object disguiseData, double gravity,
         boolean removeAtMinimumSpeed, double minimumSpeed, boolean removeAtMaximumSpeed, double maximumSpeed,
         double decrease, double decreaseInWater, double decreaseWhenRainingOrSnowing, boolean disableEntityCollisions,
-        int maximumAliveTicks, double maximumTravelDistance, double size) {
+        int maximumAliveTicks, double maximumTravelDistance, double size, boolean incendiaryProjectile, boolean extinguishInWater) {
         this.projectileDisguise = projectileDisguise;
         this.disguiseData = disguiseData;
         this.gravity = gravity;
@@ -62,6 +64,8 @@ public class ProjectileSettings implements Serializer<ProjectileSettings>, Clone
         this.maximumAliveTicks = maximumAliveTicks;
         this.maximumTravelDistance = maximumTravelDistance;
         this.size = size;
+        this.incendiaryProjectile = incendiaryProjectile;
+        this.extinguishInWater = extinguishInWater;
     }
 
     /**
@@ -221,6 +225,28 @@ public class ProjectileSettings implements Serializer<ProjectileSettings>, Clone
         this.size = size;
     }
 
+    /**
+     * @return whether the projectile is on fire or not
+     */
+    public boolean isIncendiaryProjectile() {
+        return incendiaryProjectile;
+    }
+
+    public void setIncendiaryProjectile(boolean incendiaryProjectile) {
+        this.incendiaryProjectile = incendiaryProjectile;
+    }
+
+    /**
+     * @return whether the projectile should be extinguished in water
+     */
+    public boolean isExtinguishInWater() {
+        return extinguishInWater;
+    }
+
+    public void setExtinguishInWater(boolean extinguishInWater) {
+        this.extinguishInWater = extinguishInWater;
+    }
+
     @Override
     public String getKeyword() {
         return "Projectile_Settings";
@@ -297,10 +323,12 @@ public class ProjectileSettings implements Serializer<ProjectileSettings>, Clone
         int maximumAliveTicks = data.of("Maximum_Alive_Ticks").assertRange(0, null).getInt().orElse(600);
         double maximumTravelDistance = data.of("Maximum_Travel_Distance").assertRange(0.0, null).getDouble().orElse(-1.0);
         double size = data.of("Size").assertRange(0.0, null).getDouble().orElse(0.1);
+        boolean incendiaryProjectile = data.of("Incendiary_Projectile").getBool().orElse(false);
+        boolean extinguishInWater = data.of("Extinguish_In_Water").getBool().orElse(true);
 
         return new ProjectileSettings(projectileType, disguiseData, gravity, removeAtMinimumSpeed, minimumSpeed,
             removeAtMaximumSpeed, maximumSpeed, decrease, decreaseInWater, decreaseWhenRainingOrSnowing,
-            disableEntityCollisions, maximumAliveTicks, maximumTravelDistance, size);
+            disableEntityCollisions, maximumAliveTicks, maximumTravelDistance, size, incendiaryProjectile, extinguishInWater);
     }
 
     @Override
