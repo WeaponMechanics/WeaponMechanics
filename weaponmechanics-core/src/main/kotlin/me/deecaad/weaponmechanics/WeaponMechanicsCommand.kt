@@ -105,8 +105,13 @@ import kotlin.math.sin
 object WeaponMechanicsCommand {
     const val WIKI: String = "https://cjcrafter.gitbook.io/weaponmechanics/"
 
+    private val registered = java.util.concurrent.atomic.AtomicBoolean(false)
+
     @JvmStatic
     fun registerCommands() {
+
+        if (!registered.compareAndSet(false, true)) return
+
         val weaponDataMapArgument =
             CustomMapArgument(
                 "data",
