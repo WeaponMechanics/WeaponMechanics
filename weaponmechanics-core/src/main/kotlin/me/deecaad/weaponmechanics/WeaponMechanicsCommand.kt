@@ -105,8 +105,13 @@ import kotlin.math.sin
 object WeaponMechanicsCommand {
     const val WIKI: String = "https://cjcrafter.gitbook.io/weaponmechanics/"
 
+    private val registered = java.util.concurrent.atomic.AtomicBoolean(false)
+
     @JvmStatic
     fun registerCommands() {
+
+        if (!registered.compareAndSet(false, true)) return
+
         val weaponDataMapArgument =
             CustomMapArgument(
                 "data",
@@ -1393,7 +1398,7 @@ object WeaponMechanicsCommand {
             ProjectileSettings(
                 entity, null,
                 gravity, false, -1.0, false,
-                -1.0, 0.99, 0.96, 0.98, false, 600, -1.0, 0.1,
+                -1.0, 0.99, 0.96, 0.98, false, 600, -1.0, 0.1, false, false
             )
         val projectile = Projectile(projectileSettings, null, null, null, null)
         projectile.shoot(sender, sender.eyeLocation, sender.location.direction.multiply(speed), null, null, null)

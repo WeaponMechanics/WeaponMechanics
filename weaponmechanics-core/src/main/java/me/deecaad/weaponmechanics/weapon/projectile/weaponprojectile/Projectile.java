@@ -67,46 +67,66 @@ public class Projectile implements Serializer<Projectile> {
      * @param location the location containing pitch and yaw
      */
     public WeaponProjectile shoot(WeaponProjectile projectile, Location location) {
-        if (mechanics != null) {
-            CastData cast = new CastData(projectile.getShooter(), projectile.getWeaponTitle(), projectile.getWeaponStack());
+        String weaponTitle = projectile.getWeaponTitle();
+        ItemStack weaponStack = projectile.getWeaponStack();
+        
+        if (mechanics != null && weaponTitle != null) {
+            CastData cast = new CastData(projectile.getShooter(), weaponTitle, weaponStack);
             cast.setTargetLocation(() -> projectile.getLocation().toLocation(projectile.getWorld()));
             mechanics.use(cast);
         }
 
-        EntityType type = projectileSettings.getProjectileDisguise();
+        ProjectileSettings settings = projectile.getProjectileSettings();
+        EntityType type = settings.getProjectileDisguise();
+
         if (type != null) {
 
             FakeEntity fakeEntity;
-            Object data = projectileSettings.getDisguiseData();
+            Object data = settings.getDisguiseData();
+            Location spawnLoc = location.clone();
+
             if (type == EntityType.ARMOR_STAND && data != null) {
                 // Armor stand height * eye height multiplier
                 // 1.975 * 0.85 = 1.67875
-                Location offset = new Location(location.getWorld(), 0, -1.67875, 0);
+                Location offset = new Location(spawnLoc.getWorld(), 0, -1.67875, 0);
+                spawnLoc.add(offset);
 
-                // Add the first offset before actually spawning
-                location.add(offset);
-
-                fakeEntity = CompatibilityAPI.getEntityCompatibility().generateFakeEntity(location, type, data);
-
+                fakeEntity = CompatibilityAPI.getEntityCompatibility().generateFakeEntity(spawnLoc, type, data);
                 fakeEntity.setEquipment(EquipmentSlot.HEAD, (ItemStack) data);
                 fakeEntity.setInvisible(true);
-
-                // Set the offset for new packets
                 fakeEntity.setOffset(offset);
             } else {
-                fakeEntity = CompatibilityAPI.getEntityCompatibility().generateFakeEntity(location, type, data);
+                fakeEntity = CompatibilityAPI.getEntityCompatibility().generateFakeEntity(spawnLoc, type, data);
+            }
+
+            Location projectileLocation = location.clone();
+
+            if (settings.isIncendiaryProjectile() && !isInWaterOrWaterlogged(projectileLocation)) {
+                fakeEntity.setOnFire(true);
             }
 
             projectile.spawnDisguise(fakeEntity);
         }
 
-        // Handle explosions
-        Explosion explosion = WeaponMechanics.getInstance().getWeaponConfigurations().getObject(projectile.getWeaponTitle() + ".Explosion", Explosion.class);
-        if (explosion != null)
-            explosion.handleExplosion(projectile.getShooter(), projectile, ExplosionTrigger.SPAWN);
+        if (weaponTitle != null) {
+            // Handle explosions
+            Explosion explosion = WeaponMechanics.getInstance().getWeaponConfigurations().getObject(weaponTitle + ".Explosion", Explosion.class);
+            if (explosion != null)
+                explosion.handleExplosion(projectile.getShooter(), projectile, ExplosionTrigger.SPAWN);
+        }
 
         WeaponMechanics.getInstance().getProjectileSpawner().spawn(projectile);
         return projectile;
+    }
+
+    private boolean isInWaterOrWaterlogged(Location loc) {
+        var block = loc.getBlock();
+
+        if (block.getType().name().equals("BUBBLE_COLUMN")) return true;
+        if (block.isLiquid()) return true;
+
+        var data = block.getBlockData();
+        return (data instanceof org.bukkit.block.data.Waterlogged wl) && wl.isWaterlogged();
     }
 
     /**
