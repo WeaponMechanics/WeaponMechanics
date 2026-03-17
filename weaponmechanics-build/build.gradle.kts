@@ -34,7 +34,7 @@ paperPluginYaml {
         server("WorldEdit", required = false)
         server("WorldGuard", required = false)
         server("PlaceholderAPI", required = false)
-        server("MythicMobs", required = false)
+        server("MythicMobs", required = false, load = PaperPluginYaml.Load.BEFORE)
         server("Geyser-Spigot", required = false)
         server("Vivecraft-Spigot-Extension", required = false)
     }
