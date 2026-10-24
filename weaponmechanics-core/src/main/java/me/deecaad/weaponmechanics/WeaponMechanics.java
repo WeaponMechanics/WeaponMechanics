@@ -327,6 +327,7 @@ public class WeaponMechanics extends MechanicsPlugin {
             pm.addPermission(parent);
         }
 
+        Map<String, Boolean> weaponChildren = new HashMap<>();
         for (String weaponTitle : weaponHandler.getInfoHandler().getSortedWeaponList()) {
             String node = "weaponmechanics.use." + weaponTitle;
 
@@ -336,7 +337,14 @@ public class WeaponMechanics extends MechanicsPlugin {
                 pm.addPermission(perm);
             }
 
-            perm.addParent(parent, true);
+            weaponChildren.put(perm.getName(), true);
+        }
+
+        if (!weaponChildren.isEmpty()) {
+            // Publish the completed child map once. Permission integrations may
+            // invalidate their global caches on each individual child mutation.
+            parent.getChildren().putAll(weaponChildren);
+            parent.recalculatePermissibles();
         }
 
         if (reCalculateOnlinePlayers) {

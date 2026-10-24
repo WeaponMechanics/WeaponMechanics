@@ -31,6 +31,9 @@ dependencies {
     compileOnly(kotlin("stdlib"))
 
     // Testing dependencies
+    testImplementation("org.junit.jupiter:junit-jupiter:5.11.4")
+    testImplementation("org.mockito:mockito-core:5.24.0")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.11.4")
     testImplementation(libs.paper)
     testImplementation(libs.annotations)
     testImplementation(libs.foliaScheduler)
@@ -212,4 +215,20 @@ jreleaser {
             }
         }
     }
+}
+
+// Tests load the plugin class without enabling it, so its provided API types
+// must also be available to Mockito at test runtime.
+configurations.testRuntimeClasspath {
+    extendsFrom(configurations.compileOnly.get())
+}
+
+val mockitoAgent by configurations.creating
+
+dependencies {
+    mockitoAgent("org.mockito:mockito-core:5.24.0") { isTransitive = false }
+}
+
+tasks.test {
+    jvmArgs("-javaagent:${mockitoAgent.singleFile}")
 }
