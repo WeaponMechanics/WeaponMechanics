@@ -202,8 +202,12 @@ public class TriggerPlayerListeners implements Listener {
             e.setUseInteractedBlock(Event.Result.DENY);
         }
 
-        if ((mainWeapon != null && weaponConfig.getBoolean(mainWeapon + ".Info.Cancel.Item_Interactions")
-            || offWeapon != null && weaponConfig.getBoolean(offWeapon + ".Info.Cancel.Item_Interactions"))) {
+        // Cooking weapons need the item to be used so the hold animation plays
+        boolean mainCancelsItem = mainWeapon != null && weaponConfig.getBoolean(mainWeapon + ".Info.Cancel.Item_Interactions")
+            && !weaponHandler.getCookHandler().isCookingWeapon(mainWeapon);
+        boolean offCancelsItem = offWeapon != null && weaponConfig.getBoolean(offWeapon + ".Info.Cancel.Item_Interactions")
+            && !weaponHandler.getCookHandler().isCookingWeapon(offWeapon);
+        if (mainCancelsItem || offCancelsItem) {
             e.setUseItemInHand(Event.Result.DENY);
         }
 

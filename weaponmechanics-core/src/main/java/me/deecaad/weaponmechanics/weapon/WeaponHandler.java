@@ -8,6 +8,7 @@ import me.deecaad.weaponmechanics.weapon.info.InfoHandler;
 import me.deecaad.weaponmechanics.weapon.melee.MeleeHandler;
 import me.deecaad.weaponmechanics.weapon.reload.ReloadHandler;
 import me.deecaad.weaponmechanics.weapon.scope.ScopeHandler;
+import me.deecaad.weaponmechanics.weapon.shoot.CookHandler;
 import me.deecaad.weaponmechanics.weapon.shoot.ShootHandler;
 import me.deecaad.weaponmechanics.weapon.skin.SkinHandler;
 import me.deecaad.weaponmechanics.weapon.stats.StatsHandler;
@@ -38,6 +39,7 @@ public class WeaponHandler {
 
     private final InfoHandler infoHandler;
     private final ShootHandler shootHandler;
+    private final CookHandler cookHandler;
     private final ReloadHandler reloadHandler;
     private final ScopeHandler scopeHandler;
     private final DamageHandler damageHandler;
@@ -50,6 +52,7 @@ public class WeaponHandler {
     public WeaponHandler() {
         infoHandler = new InfoHandler(this);
         shootHandler = new ShootHandler(this);
+        cookHandler = new CookHandler(this);
         reloadHandler = new ReloadHandler(this);
         scopeHandler = new ScopeHandler(this);
         damageHandler = new DamageHandler(this);
@@ -185,6 +188,13 @@ public class WeaponHandler {
      */
     public ShootHandler getShootHandler() {
         return shootHandler;
+    }
+
+    /**
+     * @return the cook handler
+     */
+    public CookHandler getCookHandler() {
+        return cookHandler;
     }
 
     /**
