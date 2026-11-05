@@ -32,6 +32,7 @@ public class WeaponProjectile extends AProjectile {
     private boolean isThroughChanged;
     private Bouncy bouncy;
     private boolean isBouncyChanged;
+    private BlockPlacement blockPlacement;
 
     private final ItemStack weaponStack;
     private final String weaponTitle;
@@ -53,13 +54,14 @@ public class WeaponProjectile extends AProjectile {
 
     public WeaponProjectile(ProjectileSettings projectileSettings, LivingEntity shooter, Location location,
         Vector motion, ItemStack weaponStack, String weaponTitle, EquipmentSlot hand,
-        Sticky sticky, Through through, Bouncy bouncy) {
+        Sticky sticky, Through through, Bouncy bouncy, BlockPlacement blockPlacement) {
         super(shooter, location, motion);
 
         this.projectileSettings = projectileSettings;
         this.sticky = sticky;
         this.through = through;
         this.bouncy = bouncy;
+        this.blockPlacement = blockPlacement;
 
         this.weaponStack = weaponStack;
         this.weaponTitle = weaponTitle;
@@ -90,7 +92,7 @@ public class WeaponProjectile extends AProjectile {
      * @return the cloned projectile
      */
     public WeaponProjectile clone(Location location, Vector motion) {
-        return new WeaponProjectile(projectileSettings, getShooter(), location, motion, weaponStack, weaponTitle, hand, sticky, through, bouncy);
+        return new WeaponProjectile(projectileSettings, getShooter(), location, motion, weaponStack, weaponTitle, hand, sticky, through, bouncy, blockPlacement);
     }
 
     public ProjectileSettings getProjectileSettings() {
@@ -183,6 +185,10 @@ public class WeaponProjectile extends AProjectile {
     public void setBouncy(@Nullable Bouncy bouncy, boolean isBouncyChanged) {
         this.bouncy = bouncy;
         this.isBouncyChanged = isBouncyChanged;
+    }
+
+    public @Nullable BlockPlacement getBlockPlacement() {
+        return blockPlacement;
     }
 
     @Override

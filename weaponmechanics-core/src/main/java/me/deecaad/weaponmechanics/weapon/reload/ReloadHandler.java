@@ -88,19 +88,44 @@ public class ReloadHandler implements IValidator, TriggerListener {
         EquipmentSlot slot, boolean dualWield, boolean isReloadLoop) {
 
         // Don't try to reload if either one of the hands is already reloading / full autoing
-        HandData mainHandData = entityWrapper.getMainHandData();
         HandData offHandData = entityWrapper.getOffHandData();
+        LivingEntity shooter = entityWrapper.getEntity();
+        HandData mainHandData = entityWrapper.getMainHandData();
         if (mainHandData.isReloading() || mainHandData.isUsingFullAuto() || mainHandData.isUsingBurst()
             || offHandData.isReloading() || offHandData.isUsingFullAuto() || offHandData.isUsingBurst()) {
             return false;
         }
 
+        Configuration config = WeaponMechanics.getInstance().getWeaponConfigurations();
+        PlayerWrapper playerWrapper = shooter.getType() != EntityType.PLAYER ? null : (PlayerWrapper) entityWrapper;
+        WeaponInfoDisplay weaponInfoDisplay = playerWrapper == null ? null : WeaponMechanics.getInstance().getWeaponConfigurations().getObject(weaponTitle + ".Info.Weapon_Info_Display", WeaponInfoDisplay.class);
+
+        AmmoConfig ammo = playerWrapper != null ? config.getObject(weaponTitle + ".Reload.Ammo", AmmoConfig.class) : null;
+        if (ammo != null && !ammo.hasAmmo(weaponTitle, weaponStack, playerWrapper)) {
+            Player player = playerWrapper.getPlayer();
+            boolean creativeBypass = player.getGameMode() == GameMode.CREATIVE && WeaponMechanics.getInstance().getConfiguration().getBoolean("Creative_Mode_Bypass_Ammo");
+            if (!creativeBypass) {
+                if (ammo.getOutOfAmmoMechanics() != null) {
+                    ammo.getOutOfAmmoMechanics().use(new CastData(shooter, weaponTitle, weaponStack));
+                }
+
+                String noAmmoMessage = WeaponMechanics.getInstance().getConfiguration().getString("Messages.Reload.No_Ammo", "");
+                if (!noAmmoMessage.isEmpty()) {
+                    PlaceholderMessage message = new PlaceholderMessage(StringUtil.colorAdventure(noAmmoMessage));
+                    Component component = message.replaceAndDeserialize(PlaceholderData.of(player, weaponStack, weaponTitle, slot));
+                    player.sendActionBar(component);
+                }
+
+                return false;
+            }
+        }
+
         WeaponPreReloadEvent preReloadEvent = new WeaponPreReloadEvent(weaponTitle, weaponStack, entityWrapper.getEntity(), slot);
         Bukkit.getPluginManager().callEvent(preReloadEvent);
-        if (preReloadEvent.isCancelled())
+        if (preReloadEvent.isCancelled()) {
             return false;
+        }
 
-        Configuration config = WeaponMechanics.getInstance().getWeaponConfigurations();
 
         int reloadDuration = config.getInt(weaponTitle + ".Reload.Reload_Duration");
         int tempMagazineSize = config.getInt(weaponTitle + ".Reload.Magazine_Size");
@@ -109,7 +134,6 @@ public class ReloadHandler implements IValidator, TriggerListener {
             return false;
         }
 
-        LivingEntity shooter = entityWrapper.getEntity();
 
         // Handle permissions
         boolean hasPermission = weaponHandler.getInfoHandler().hasPermission(entityWrapper.getEntity(), weaponTitle);
@@ -139,8 +163,6 @@ public class ReloadHandler implements IValidator, TriggerListener {
 
         int ammoPerReload = config.getInt(weaponTitle + ".Reload.Ammo_Per_Reload", -1);
 
-        PlayerWrapper playerWrapper = shooter.getType() != EntityType.PLAYER ? null : (PlayerWrapper) entityWrapper;
-        WeaponInfoDisplay weaponInfoDisplay = playerWrapper == null ? null : WeaponMechanics.getInstance().getWeaponConfigurations().getObject(weaponTitle + ".Info.Weapon_Info_Display", WeaponInfoDisplay.class);
 
         FirearmAction firearmAction = config.getObject(weaponTitle + ".Firearm_Action", FirearmAction.class);
         FirearmState state = null;
@@ -211,16 +233,6 @@ public class ReloadHandler implements IValidator, TriggerListener {
             }
 
             return false;
-        }
-
-        AmmoConfig ammo = playerWrapper != null ? config.getObject(weaponTitle + ".Reload.Ammo", AmmoConfig.class) : null;
-        if (ammo != null && !ammo.hasAmmo(weaponTitle, weaponStack, playerWrapper)) {
-            // Creative mode bypass... #176
-            if (playerWrapper.getPlayer().getGameMode() != GameMode.CREATIVE || !WeaponMechanics.getInstance().getConfiguration().getBoolean("Creative_Mode_Bypass_Ammo")) {
-                if (ammo.getOutOfAmmoMechanics() != null)
-                    ammo.getOutOfAmmoMechanics().use(new CastData(shooter, weaponTitle, weaponStack));
-                return false;
-            }
         }
 
         // Check how much ammo should be added during this reload iteration

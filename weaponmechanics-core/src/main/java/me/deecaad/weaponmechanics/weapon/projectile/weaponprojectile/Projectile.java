@@ -31,6 +31,7 @@ public class Projectile implements Serializer<Projectile> {
     private Sticky sticky;
     private Through through;
     private Bouncy bouncy;
+    private BlockPlacement blockPlacement;
     private MechanicManager mechanics;
 
     /**
@@ -39,11 +40,12 @@ public class Projectile implements Serializer<Projectile> {
     public Projectile() {
     }
 
-    public Projectile(ProjectileSettings projectileSettings, Sticky sticky, Through through, Bouncy bouncy, MechanicManager mechanics) {
+    public Projectile(ProjectileSettings projectileSettings, Sticky sticky, Through through, Bouncy bouncy, BlockPlacement blockPlacement, MechanicManager mechanics) {
         this.projectileSettings = projectileSettings;
         this.sticky = sticky;
         this.through = through;
         this.bouncy = bouncy;
+        this.blockPlacement = blockPlacement;
         this.mechanics = mechanics;
     }
 
@@ -139,7 +141,7 @@ public class Projectile implements Serializer<Projectile> {
      * @param weaponTitle the weapon title used to shoot
      */
     public WeaponProjectile create(LivingEntity shooter, Location location, Vector motion, ItemStack weaponStack, String weaponTitle, EquipmentSlot hand) {
-        return new WeaponProjectile(projectileSettings, shooter, location, motion, weaponStack, weaponTitle, hand, sticky, through, bouncy);
+        return new WeaponProjectile(projectileSettings, shooter, location, motion, weaponStack, weaponTitle, hand, sticky, through, bouncy, blockPlacement);
     }
 
     @Override
@@ -177,7 +179,8 @@ public class Projectile implements Serializer<Projectile> {
         Sticky sticky = data.of("Sticky").serialize(Sticky.class).orElse(null);
         Through through = data.of("Through").serialize(Through.class).orElse(null);
         Bouncy bouncy = data.of("Bouncy").serialize(Bouncy.class).orElse(null);
+        BlockPlacement blockPlacement = data.of("Block_Placement").serialize(BlockPlacement.class).orElse(null);
         MechanicManager mechanics = data.of("Mechanics").serialize(MechanicManager.class).orElse(null);
-        return new Projectile(projectileSettings, sticky, through, bouncy, mechanics);
+        return new Projectile(projectileSettings, sticky, through, bouncy, blockPlacement, mechanics);
     }
 }

@@ -24,6 +24,7 @@ import me.deecaad.weaponmechanics.weapon.explode.shapes.DefaultExplosion;
 import me.deecaad.weaponmechanics.weapon.explode.shapes.ExplosionShape;
 import me.deecaad.weaponmechanics.weapon.explode.shapes.ExplosionShapes;
 import me.deecaad.weaponmechanics.weapon.projectile.RemoveOnBlockCollisionProjectile;
+import me.deecaad.weaponmechanics.weapon.projectile.weaponprojectile.BlockPlacement;
 import me.deecaad.weaponmechanics.weapon.projectile.weaponprojectile.WeaponProjectile;
 import me.deecaad.weaponmechanics.weapon.stats.WeaponStat;
 import me.deecaad.weaponmechanics.weapon.weaponevents.ProjectileExplodeEvent;
@@ -64,6 +65,7 @@ public class Explosion implements Serializer<Explosion> {
     private AirStrike airStrike;
     private Flashbang flashbang;
     private MechanicManager mechanics;
+    private BlockPlacement blockPlacement;
 
     /**
      * Default constructor for serializer.
@@ -92,7 +94,8 @@ public class Explosion implements Serializer<Explosion> {
      */
     public Explosion(ExplosionShape shape, ExplosionExposure exposure, BlockDamage blockDamage,
         RegenerationData regeneration, Detonation detonation, double blockChance, double knockbackRate,
-        ClusterBomb clusterBomb, AirStrike airStrike, Flashbang flashbang, MechanicManager mechanics) {
+        ClusterBomb clusterBomb, AirStrike airStrike, Flashbang flashbang, MechanicManager mechanics,
+        BlockPlacement blockPlacement) {
 
         this.shape = shape;
         this.exposure = exposure;
@@ -105,6 +108,7 @@ public class Explosion implements Serializer<Explosion> {
         this.airStrike = airStrike;
         this.flashbang = flashbang;
         this.mechanics = mechanics;
+        this.blockPlacement = blockPlacement;
     }
 
     public ExplosionShape getShape() {
@@ -299,6 +303,10 @@ public class Explosion implements Serializer<Explosion> {
             damageBlocks(solid, false, origin, 0, playerWrapper, projectile);
         }
 
+        if (blockPlacement != null) {
+            blockPlacement.handleExplosionPlacement(origin, blocks);
+        }
+
         if (projectile != null && projectile.getWeaponTitle() != null) {
             WeaponMechanics.getInstance().getWeaponHandler().getDamageHandler().tryUseExplosion(this, projectile, origin, entities);
 
@@ -482,8 +490,9 @@ public class Explosion implements Serializer<Explosion> {
         AirStrike airStrike = data.of("Airstrike").serialize(AirStrike.class).orElse(null);
         Flashbang flashbang = data.of("Flashbang").serialize(Flashbang.class).orElse(null);
         MechanicManager mechanics = data.of("Mechanics").serialize(MechanicManager.class).orElse(null);
+        BlockPlacement blockPlacement = data.of("Block_Placement").serialize(BlockPlacement.class).orElse(null);
 
         return new Explosion(shape, exposure, blockDamage, regeneration, detonation, blockChance,
-            knockbackRate, clusterBomb, airStrike, flashbang, mechanics);
+            knockbackRate, clusterBomb, airStrike, flashbang, mechanics, blockPlacement);
     }
 }

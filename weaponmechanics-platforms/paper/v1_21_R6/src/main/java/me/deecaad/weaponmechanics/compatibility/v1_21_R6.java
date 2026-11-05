@@ -1,5 +1,8 @@
 package me.deecaad.weaponmechanics.compatibility;
 
+import com.cjcrafter.foliascheduler.TaskImplementation;
+import me.deecaad.weaponmechanics.WeaponMechanics;
+import me.deecaad.weaponmechanics.wrappers.ZoomData;
 import net.minecraft.network.protocol.game.ClientboundPlayerPositionPacket;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageSources;
@@ -7,10 +10,14 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PositionMoveRotation;
 import net.minecraft.world.entity.Relative;
 import net.minecraft.world.phys.Vec3;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.craftbukkit.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -71,5 +78,35 @@ public class v1_21_R6 implements IWeaponCompatibility {
     @Override
     public void setKiller(org.bukkit.entity.LivingEntity victim, Player killer) {
         ((CraftLivingEntity) victim).getHandle().setLastHurtByPlayer(((CraftPlayer) killer).getHandle(), 100);
+    }
+
+    @Override
+    public TaskImplementation<Void> playAdsSettleAnimation(Player player, int durationTicks) {
+        ((CraftPlayer) player).getHandle().resetAttackStrengthTicker();
+
+        AttributeInstance attribute = player.getAttribute(Attribute.ATTACK_SPEED);
+        if (attribute != null) {
+            removeAdsSpeedModifier(attribute);
+
+            double requiredSpeed = 20.0 / Math.max(1, durationTicks);
+            double addValue = requiredSpeed - attribute.getValue();
+            attribute.addModifier(new AttributeModifier(ZoomData.ADS_SPEED_MODIFIER_KEY, addValue, AttributeModifier.Operation.ADD_NUMBER));
+        }
+
+        return WeaponMechanics.getInstance().getFoliaScheduler().entity(player).runDelayed(() -> {
+            AttributeInstance current = player.getAttribute(Attribute.ATTACK_SPEED);
+            if (current != null) {
+                removeAdsSpeedModifier(current);
+            }
+        }, durationTicks);
+    }
+
+    private void removeAdsSpeedModifier(AttributeInstance attribute) {
+        for (AttributeModifier modifier : new ArrayList<>(attribute.getModifiers())) {
+            if (ZoomData.ADS_SPEED_MODIFIER_KEY.equals(modifier.getKey())) {
+                attribute.removeModifier(modifier);
+                break;
+            }
+        }
     }
 }

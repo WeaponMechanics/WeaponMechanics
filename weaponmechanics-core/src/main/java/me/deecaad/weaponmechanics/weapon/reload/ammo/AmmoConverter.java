@@ -15,7 +15,7 @@ public class AmmoConverter extends WeaponConverter {
     }
 
     public AmmoConverter(boolean type, boolean name, boolean lore, boolean enchantments, boolean cmd) {
-        super(type, name, lore, enchantments, cmd);
+        super(type, name, lore, enchantments, cmd, false);
     }
 
     @Override

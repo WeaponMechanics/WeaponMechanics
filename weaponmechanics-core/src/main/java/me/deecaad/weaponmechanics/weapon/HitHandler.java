@@ -16,6 +16,7 @@ import me.deecaad.weaponmechanics.weapon.damage.ProjectileDamageSource;
 import me.deecaad.weaponmechanics.weapon.damage.WeaponDamageSource;
 import me.deecaad.weaponmechanics.weapon.explode.Explosion;
 import me.deecaad.weaponmechanics.weapon.explode.ExplosionTrigger;
+import me.deecaad.weaponmechanics.weapon.projectile.weaponprojectile.BlockPlacement;
 import me.deecaad.weaponmechanics.weapon.projectile.weaponprojectile.WeaponProjectile;
 import me.deecaad.weaponmechanics.weapon.weaponevents.ProjectileHitBlockEvent;
 import me.deecaad.weaponmechanics.weapon.weaponevents.ProjectileHitEntityEvent;
@@ -105,6 +106,11 @@ public class HitHandler {
         Bukkit.getPluginManager().callEvent(hitBlockEvent);
         if (hitBlockEvent.isCancelled())
             return true;
+
+        BlockPlacement blockPlacement = projectile.getBlockPlacement();
+        if (blockPlacement != null) {
+            blockPlacement.handleBlockPlacement(result, projectile);
+        }
 
         Explosion explosion = WeaponMechanics.getInstance().getWeaponConfigurations().getObject(projectile.getWeaponTitle() + ".Explosion", Explosion.class);
         if (explosion != null) {

@@ -1003,7 +1003,7 @@ object WeaponMechanicsCommand {
                 val explosion =
                     Explosion(
                         shape, exposure, blockDamage, regeneration, null, 0.0, 1.0,
-                        null, null, Flashbang(10.0, null), null,
+                        null, null, Flashbang(10.0, null), null, null,
                     )
                 explosion.explode(cause, origin, null)
             },
@@ -1396,7 +1396,7 @@ object WeaponMechanicsCommand {
                 gravity, false, -1.0, false,
                 -1.0, 0.99, 0.96, 0.98, false, 600, -1.0, 0.1, false, false
             )
-        val projectile = Projectile(projectileSettings, null, null, null, null)
+        val projectile = Projectile(projectileSettings, null, null, null, null, null)
         projectile.shoot(sender, sender.eyeLocation, sender.location.direction.multiply(speed), null, null, null)
     }
 
