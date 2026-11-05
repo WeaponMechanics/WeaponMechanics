@@ -1,11 +1,16 @@
 package me.deecaad.weaponmechanics.wrappers;
 
+import com.cjcrafter.foliascheduler.TaskImplementation;
 import me.deecaad.core.mechanics.CastData;
 import me.deecaad.core.mechanics.MechanicManager;
 import me.deecaad.weaponmechanics.WeaponMechanics;
 import me.deecaad.weaponmechanics.weapon.scope.ScopeHandler;
 import me.deecaad.weaponmechanics.weapon.weaponevents.WeaponScopeEvent;
 import org.bukkit.Bukkit;
+import org.bukkit.NamespacedKey;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
@@ -13,7 +18,11 @@ import org.vivecraft.api.VRAPI;
 import org.vivecraft.api.data.VRBodyPartData;
 import org.vivecraft.api.data.VRPose;
 
+import java.util.ArrayList;
+
 public class ZoomData {
+
+    public static final NamespacedKey ADS_SPEED_MODIFIER_KEY = new NamespacedKey("weaponmechanics", "ads_speed");
 
     private final HandData handData;
     private double zoomAmount;
@@ -21,6 +30,9 @@ public class ZoomData {
     private boolean zoomNightVision;
     private ItemStack scopeWeaponStack;
     private String scopeWeaponTitle;
+
+    private long scopeSettleEndTime;
+    private TaskImplementation<Void> adsSettleTask;
 
     public ZoomData(HandData handData) {
         this.handData = handData;
@@ -100,7 +112,45 @@ public class ZoomData {
         this.zoomNightVision = zoomNightVision;
     }
 
+    public boolean isSettling() {
+        return scopeSettleEndTime != 0 && System.currentTimeMillis() < scopeSettleEndTime;
+    }
+
+    public void startSettling(long durationMillis) {
+        this.scopeSettleEndTime = System.currentTimeMillis() + durationMillis;
+    }
+
+    public void setAdsSettleTask(TaskImplementation<Void> task) {
+        this.adsSettleTask = task;
+    }
+
+    public void stopSettling() {
+        this.scopeSettleEndTime = 0;
+        if (adsSettleTask != null) {
+            adsSettleTask.cancel();
+            adsSettleTask = null;
+        }
+
+        if (!(handData.getEntityWrapper().getEntity() instanceof Player player)) {
+            return;
+        }
+
+        AttributeInstance attribute = player.getAttribute(Attribute.ATTACK_SPEED);
+        if (attribute == null) {
+            return;
+        }
+
+        for (AttributeModifier modifier : new ArrayList<>(attribute.getModifiers())) {
+            if (ADS_SPEED_MODIFIER_KEY.equals(modifier.getKey())) {
+                attribute.removeModifier(modifier);
+                break;
+            }
+        }
+    }
+
     public void ifZoomingForceZoomOut() {
+        stopSettling();
+
         if (isZooming()) {
 
             // IF player is in VR this happens

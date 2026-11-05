@@ -3,6 +3,7 @@ package me.deecaad.weaponmechanics.weapon.shoot;
 import me.deecaad.core.file.Serializer;
 import me.deecaad.weaponmechanics.wrappers.EntityWrapper;
 import me.deecaad.weaponmechanics.wrappers.PlayerWrapper;
+import me.deecaad.weaponmechanics.wrappers.ZoomData;
 
 public abstract class AModifyWhen implements Serializer<AModifyWhen> {
 
@@ -53,8 +54,12 @@ public abstract class AModifyWhen implements Serializer<AModifyWhen> {
         if (always != null) {
             tempNumber = always.applyTo(tempNumber);
         }
-        if (zooming != null && (entityWrapper.getMainHandData().getZoomData().isZooming() || entityWrapper.getOffHandData().getZoomData().isZooming())) {
-            tempNumber = zooming.applyTo(tempNumber);
+        if (zooming != null) {
+            ZoomData mainZoom = entityWrapper.getMainHandData().getZoomData();
+            ZoomData offZoom = entityWrapper.getOffHandData().getZoomData();
+            if ((mainZoom.isZooming() || offZoom.isZooming()) && !mainZoom.isSettling() && !offZoom.isSettling()) {
+                tempNumber = zooming.applyTo(tempNumber);
+            }
         }
         if (sneaking != null && entityWrapper.isSneaking()) {
             tempNumber = sneaking.applyTo(tempNumber);

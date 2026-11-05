@@ -1,5 +1,6 @@
 package me.deecaad.weaponmechanics.compatibility;
 
+import com.cjcrafter.foliascheduler.TaskImplementation;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
@@ -40,4 +41,6 @@ public interface IWeaponCompatibility {
      * @param killer The killer
      */
     void setKiller(LivingEntity victim, Player killer);
+
+    TaskImplementation<Void> playAdsSettleAnimation(Player player, int durationTicks);
 }

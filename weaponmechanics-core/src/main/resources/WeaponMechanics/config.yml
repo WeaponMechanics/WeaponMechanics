@@ -40,6 +40,9 @@ Assists_Event:
 Messages:
   Permissions:
     Use_Weapon: "&4You do not have permission to use %weapon-title%"
+  Reload:
+    # Set to empty string ("") to disable this message
+    No_Ammo: "<red>You don't have enough ammo to reload <gold><weapon_title><red>!"
 
 # Automatically download MechanicsCore when not already installed.
 Mechanics_Core_Download:
