@@ -181,6 +181,9 @@ public class Explosion implements Serializer<Explosion> {
         // Set to 1 to indicate that this projectile has been detonated
         projectile.setIntTag("explosion-detonation", 1);
 
+        // Ticks the shooter spent cooking the projectile before throwing it
+        int delay = Math.max(1, currentDetonation.getDelay() - projectile.getIntTag("cooked-ticks"));
+
         WeaponMechanics.getInstance().getFoliaScheduler().region(projectile.getBukkitLocation()).runDelayed(() -> {
             ProjectilePreExplodeEvent event = new ProjectilePreExplodeEvent(projectile, Explosion.this);
             Bukkit.getPluginManager().callEvent(event);
@@ -192,7 +195,7 @@ public class Explosion implements Serializer<Explosion> {
             if (currentDetonation.isRemoveProjectileOnDetonation()) {
                 projectile.remove();
             }
-        }, currentDetonation.getDelay());
+        }, delay);
 
         MechanicManager impactMechanics = currentDetonation.getImpactMechanics();
         if (impactMechanics != null) {

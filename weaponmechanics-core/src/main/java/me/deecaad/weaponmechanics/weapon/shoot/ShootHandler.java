@@ -85,6 +85,10 @@ public class ShootHandler implements IValidator, TriggerListener {
         if (trigger == null || !trigger.check(triggerType, slot, entityWrapper))
             return false;
 
+        if (triggerType == TriggerType.RIGHT_CLICK && weaponHandler.getCookHandler().tryStart(entityWrapper, weaponTitle, weaponStack, slot, dualWield)) {
+            return true;
+        }
+
         boolean result = shootWithoutTrigger(entityWrapper, weaponTitle, weaponStack, slot, triggerType, dualWield);
 
         return result;
@@ -582,6 +586,11 @@ public class ShootHandler implements IValidator, TriggerListener {
             }
         }
 
+        HandData cookHandData = entityWrapper.getHandData(mainHand);
+        int cookedTicks = cookHandData.getCookedTicks();
+        boolean cookedInHand = cookHandData.isCookedInHand();
+        cookHandData.setCooked(0, false);
+
         // Consumables can have no projectile, so only try to fire bullets if there is a projectile
         if (prepareEvent.getProjectile() != null) {
             for (int i = 0; i < prepareEvent.getProjectileAmount(); i++) {
@@ -600,8 +609,13 @@ public class ShootHandler implements IValidator, TriggerListener {
 
                 motion.multiply(prepareEvent.getProjectileSpeed());
 
+                if (cookedInHand) {
+                    motion.zero();
+                }
+
                 // Only create bullet first if WeaponShootEvent changes
                 WeaponProjectile bullet = prepareEvent.getProjectile().create(livingEntity, perProjectileShootLocation, motion, weaponStack, weaponTitle, slot);
+                bullet.setIntTag("cooked-ticks", cookedTicks);
 
                 WeaponShootEvent shootEvent = new WeaponShootEvent(bullet);
                 Bukkit.getPluginManager().callEvent(shootEvent);
@@ -828,6 +842,9 @@ public class ShootHandler implements IValidator, TriggerListener {
         }
 
         configuration.set(data.getKey() + ".Reset_Fall_Distance", data.of("Reset_Fall_Distance").getBool().orElse(false));
+
+        data.of("Cooking.Start_Mechanics").serialize(MechanicManager.class)
+            .ifPresent(mechanics -> configuration.set(data.getKey() + ".Cooking.Start_Mechanics", mechanics));
 
         if (Bukkit.getPluginManager().getPlugin("Vivecraft_Spigot_Extensions") != null) {
             configuration.set(data.getKey() + ".Haptic", data.of("Haptic").serialize(HapticSerializer.class).orElse(null));

@@ -42,6 +42,15 @@ Grenade:
     Projectile_Speed: 36
     Delay_Between_Shots: 20
     Consume_Item_On_Shoot: true
+
+    # Hold RIGHT_CLICK to cook the grenade, release to throw it. The time spent
+    # cooking is taken off of Explosion.Detonation.Delay_After_Impact, and the
+    # grenade explodes in hand if the fuse runs out. Requires a holdable base
+    # item (e.g. Weapon_Item.Type: TRIDENT), and Impact_When.Spawn: true.
+    Cooking:
+      Enable: false
+      Start_Mechanics:
+        - "Sound{sound=block.tripwire.click_on, volume=1, pitch=1.5}"
     Mechanics:
       - "Sound{sound=entity.egg.throw, volume=0.5, noise=0.1}"
   Damage:

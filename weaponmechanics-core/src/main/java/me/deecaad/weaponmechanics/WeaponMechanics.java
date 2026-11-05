@@ -273,6 +273,7 @@ public class WeaponMechanics extends MechanicsPlugin {
         pm.registerEvents(new TriggerPlayerListeners(weaponHandler), this);
         pm.registerEvents(new TriggerEntityListeners(weaponHandler), this);
         pm.registerEvents(new WeaponListeners(weaponHandler), this);
+        pm.registerEvents(weaponHandler.getCookHandler(), this);
         pm.registerEvents(new ExplosionInteractionListeners(), this);
 
         if (resourcePackListener == null) {

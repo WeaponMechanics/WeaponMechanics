@@ -28,6 +28,9 @@ public class HandData {
     private FullAutoTask fullAutoTask;
     private TaskImplementation<Void> fullAutoWrappedTask;
     private TaskImplementation<Void> burstTask;
+    private TaskImplementation<Void> cookTask;
+    private int cookedTicks;
+    private boolean cookedInHand;
     private long lastShotTime;
     private long lastScopeTime;
     private long lastEquipTime;
@@ -86,6 +89,7 @@ public class HandData {
             burstTask.cancel();
             burstTask = null;
         }
+        stopCooking();
         stopReloadingTasks();
         stopFirearmActionTasks();
         getZoomData().ifZoomingForceZoomOut();
@@ -158,6 +162,35 @@ public class HandData {
 
     public void setBurstTask(TaskImplementation<Void> burstTask) {
         this.burstTask = burstTask;
+    }
+
+    public boolean isCooking() {
+        return cookTask != null;
+    }
+
+    public void setCookTask(@Nullable TaskImplementation<Void> cookTask) {
+        this.cookTask = cookTask;
+    }
+
+    public void stopCooking() {
+        if (cookTask == null)
+            return;
+
+        cookTask.cancel();
+        cookTask = null;
+    }
+
+    public int getCookedTicks() {
+        return cookedTicks;
+    }
+
+    public boolean isCookedInHand() {
+        return cookedInHand;
+    }
+
+    public void setCooked(int cookedTicks, boolean cookedInHand) {
+        this.cookedTicks = cookedTicks;
+        this.cookedInHand = cookedInHand;
     }
 
     public void setLastShotTime(long lastShotTime) {
